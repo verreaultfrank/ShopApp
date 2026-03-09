@@ -249,22 +249,25 @@ public partial class AnalyticsViewModel : ObservableObject
 
             var results = await _analyticsService.ExecuteQueryAsync(config);
 
-            ChartData.Clear();
-            foreach (var row in results)
+            MainThread.BeginInvokeOnMainThread(() =>
             {
-                var xVal = row.ContainsKey("XValue") ? row["XValue"]?.ToString() ?? "(null)" : "(null)";
-                double yVal = 0;
-                if (row.ContainsKey("YValue") && row["YValue"] != DBNull.Value)
+                ChartData.Clear();
+                foreach (var row in results)
                 {
-                    double.TryParse(row["YValue"]?.ToString(), out yVal);
+                    var xVal = row.ContainsKey("XValue") ? row["XValue"]?.ToString() ?? "(null)" : "(null)";
+                    double yVal = 0;
+                    if (row.ContainsKey("YValue") && row["YValue"] != DBNull.Value)
+                    {
+                        double.TryParse(row["YValue"]?.ToString(), out yVal);
+                    }
+
+                    ChartData.Add(new ChartDataPoint { XValue = xVal, YValue = yVal });
                 }
 
-                ChartData.Add(new ChartDataPoint { XValue = xVal, YValue = yVal });
-            }
-
-            HasData = ChartData.Count > 0;
-            if (!HasData)
-                ErrorMessage = "Query returned no results.";
+                HasData = ChartData.Count > 0;
+                if (!HasData)
+                    ErrorMessage = "Query returned no results.";
+            });
         }
         catch (Exception ex)
         {

@@ -182,32 +182,35 @@ public partial class MainViewModel : ObservableObject
 
             var domainLeads = await _repository.GetLeadsAsync(SearchText, pList, sList, CurrentPage, PageSize, SelectedSortOption);
 
-            // Map Domain models to Presentation models (DashboardJobOpportunity)
-            foreach (var lead in domainLeads)
+            MainThread.BeginInvokeOnMainThread(() =>
             {
-                var dashboardJob = MapToDashboard(lead);
-
-                // MAUI Picker Reference Binding Bug workaround:
-                // Overriding Equals in Domain models is not always respected by bound DataTemplates.
-                // We must explicitly align the object reference pointers generated from the database fetch
-                // with the exact references held in the `Available` collections that act as the Pickers' ItemsSource.
-                if (dashboardJob.BusinessId.HasValue)
+                // Map Domain models to Presentation models (DashboardJobOpportunity)
+                foreach (var lead in domainLeads)
                 {
-                    dashboardJob.Business = AvailableBusinesses.FirstOrDefault(b => b.Id == dashboardJob.BusinessId) ?? dashboardJob.Business;
-                    if (dashboardJob.PreferredContactId.HasValue && dashboardJob.Business != null)
+                    var dashboardJob = MapToDashboard(lead);
+
+                    // MAUI Picker Reference Binding Bug workaround:
+                    // Overriding Equals in Domain models is not always respected by bound DataTemplates.
+                    // We must explicitly align the object reference pointers generated from the database fetch
+                    // with the exact references held in the `Available` collections that act as the Pickers' ItemsSource.
+                    if (dashboardJob.BusinessId.HasValue)
                     {
-                        dashboardJob.PreferredContact = dashboardJob.Business.Contacts.FirstOrDefault(c => c.Id == dashboardJob.PreferredContactId) ?? dashboardJob.PreferredContact;
+                        dashboardJob.Business = AvailableBusinesses.FirstOrDefault(b => b.Id == dashboardJob.BusinessId) ?? dashboardJob.Business;
+                        if (dashboardJob.PreferredContactId.HasValue && dashboardJob.Business != null)
+                        {
+                            dashboardJob.PreferredContact = dashboardJob.Business.Contacts.FirstOrDefault(c => c.Id == dashboardJob.PreferredContactId) ?? dashboardJob.PreferredContact;
+                        }
                     }
-                }
 
-                var latestHistory = dashboardJob.StatusHistories?.OrderByDescending(x => x.Date).FirstOrDefault();
-                if (latestHistory?.Status != null)
-                {
-                    latestHistory.Status = AvailableStatuses.FirstOrDefault(s => s.Id == latestHistory.Status.Id) ?? latestHistory.Status;
-                }
+                    var latestHistory = dashboardJob.StatusHistories?.OrderByDescending(x => x.Date).FirstOrDefault();
+                    if (latestHistory?.Status != null)
+                    {
+                        latestHistory.Status = AvailableStatuses.FirstOrDefault(s => s.Id == latestHistory.Status.Id) ?? latestHistory.Status;
+                    }
 
-                Jobs.Add(dashboardJob);
-            }
+                    Jobs.Add(dashboardJob);
+                }
+            });
 
             if (domainLeads.Any())
             {

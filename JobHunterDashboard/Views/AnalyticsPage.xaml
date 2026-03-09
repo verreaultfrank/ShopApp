@@ -4,6 +4,7 @@
              xmlns:chart="clr-namespace:Syncfusion.Maui.Charts;assembly=Syncfusion.Maui.Charts"
              xmlns:vm="clr-namespace:JobHunterDashboard.ViewModels"
              x:Class="JobHunterDashboard.Views.AnalyticsPage"
+             x:Name="AnalyticsDashboardPage"
              Title="Analytics"
              BackgroundColor="{DynamicResource AppBackgroundColor}">
 

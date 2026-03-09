@@ -207,6 +207,7 @@
         <ContentView Grid.Row="2" Padding="20,0,20,20">
             <CollectionView
                 ItemsSource="{Binding Jobs}"
+                ItemsUpdatingScrollMode="KeepScrollOffset"
                 RemainingItemsThreshold="5"
                 RemainingItemsThresholdReachedCommand="{Binding LoadMoreCommand}">
                 <CollectionView.ItemTemplate>
@@ -447,7 +448,7 @@
                                     <Button
                                         Padding="10,6"
                                         BackgroundColor="#fd7e14"
-                                        Command="{Binding Source={RelativeSource AncestorType={x:Type viewmodels:MainViewModel}}, Path=OpenLeadFolderCommand}"
+                                        Command="{Binding Source={x:Reference LeadDashboardPage}, Path=BindingContext.OpenLeadFolderCommand}"
                                         CommandParameter="{Binding .}"
                                         CornerRadius="8"
                                         FontAttributes="Bold"
@@ -458,7 +459,7 @@
                                     <Button
                                         Padding="10,6"
                                         BackgroundColor="#28a745"
-                                        Command="{Binding Source={RelativeSource AncestorType={x:Type viewmodels:MainViewModel}}, Path=ViewHistoryCommand}"
+                                        Command="{Binding Source={x:Reference LeadDashboardPage}, Path=BindingContext.ViewHistoryCommand}"
                                         CommandParameter="{Binding .}"
                                         CornerRadius="8"
                                         FontAttributes="Bold"
@@ -470,7 +471,7 @@
                                     <Button
                                         Padding="15,6"
                                         BackgroundColor="{DynamicResource AppPrimaryColor}"
-                                        Command="{Binding Source={RelativeSource AncestorType={x:Type viewmodels:MainViewModel}}, Path=ViewJobCommand}"
+                                        Command="{Binding Source={x:Reference LeadDashboardPage}, Path=BindingContext.ViewJobCommand}"
                                         CommandParameter="{Binding Url}"
                                         CornerRadius="8"
                                         FontAttributes="Bold"

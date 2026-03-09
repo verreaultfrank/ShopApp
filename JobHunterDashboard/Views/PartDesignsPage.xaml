@@ -5,11 +5,12 @@
     xmlns:x="http://schemas.microsoft.com/winfx/2009/xaml"
     xmlns:models="clr-namespace:JobHunter.Domain.Models;assembly=JobHunter.Domain"
     xmlns:viewmodels="clr-namespace:JobHunterDashboard.ViewModels"
+    x:Name="PartDesignsHubPage"
     BackgroundColor="{DynamicResource AppBackgroundColor}"
     Shell.NavBarIsVisible="False">
-    
+
     <Grid RowDefinitions="Auto, *">
-        <!-- Search Bar -->
+        <!--  Search Bar  -->
         <Border
             Grid.Row="0"
             Margin="20,20,20,15"
@@ -31,8 +32,12 @@
                     TextColor="{DynamicResource AppTextColor}" />
             </Frame>
         </Border>
-        
-        <CollectionView Grid.Row="1" ItemsSource="{Binding Parts}" Margin="20,0,20,20">
+
+        <CollectionView
+            Grid.Row="1"
+            Margin="20,0,20,20"
+            ItemsSource="{Binding Parts}"
+            ItemsUpdatingScrollMode="KeepScrollOffset">
             <CollectionView.ItemTemplate>
                 <DataTemplate x:DataType="models:PartDesign">
                     <Border
@@ -41,10 +46,38 @@
                         Stroke="{DynamicResource AppBorderColor}"
                         StrokeShape="RoundRectangle 12"
                         StrokeThickness="1">
-                        <Grid Padding="20" ColumnDefinitions="*, Auto" RowDefinitions="Auto, Auto">
-                            <Label Grid.Row="0" Grid.Column="0" FontAttributes="Bold" FontSize="18" Text="{Binding Name}" TextColor="{DynamicResource AppTextColor}" />
-                            <Label Grid.Row="1" Grid.Column="0" Margin="0,5,0,0" FontSize="12" Text="{Binding CadFilePath}" TextColor="{DynamicResource AppSubtextColor}" LineBreakMode="TailTruncation" />
-                            <Button Grid.Row="0" Grid.RowSpan="2" Grid.Column="1" Padding="15,6" BackgroundColor="{DynamicResource AppPrimaryColor}" Command="{Binding Source={RelativeSource AncestorType={x:Type viewmodels:PartDesignsViewModel}}, Path=ViewCadCommand}" CommandParameter="{Binding CadFilePath}" CornerRadius="8" FontAttributes="Bold" Text="View CAD" TextColor="{DynamicResource AppSurfaceColor}" VerticalOptions="Center" />
+                        <Grid
+                            Padding="20"
+                            ColumnDefinitions="*, Auto"
+                            RowDefinitions="Auto, Auto">
+                            <Label
+                                Grid.Row="0"
+                                Grid.Column="0"
+                                FontAttributes="Bold"
+                                FontSize="18"
+                                Text="{Binding Name}"
+                                TextColor="{DynamicResource AppTextColor}" />
+                            <Label
+                                Grid.Row="1"
+                                Grid.Column="0"
+                                Margin="0,5,0,0"
+                                FontSize="12"
+                                LineBreakMode="TailTruncation"
+                                Text="{Binding CadFilePath}"
+                                TextColor="{DynamicResource AppSubtextColor}" />
+                            <Button
+                                Grid.Row="0"
+                                Grid.RowSpan="2"
+                                Grid.Column="1"
+                                Padding="15,6"
+                                BackgroundColor="{DynamicResource AppPrimaryColor}"
+                                Command="{Binding Source={x:Reference PartDesignsHubPage}, Path=BindingContext.ViewCadCommand}"
+                                CommandParameter="{Binding CadFilePath}"
+                                CornerRadius="8"
+                                FontAttributes="Bold"
+                                Text="View CAD"
+                                TextColor="{DynamicResource AppSurfaceColor}"
+                                VerticalOptions="Center" />
                         </Grid>
                     </Border>
                 </DataTemplate>

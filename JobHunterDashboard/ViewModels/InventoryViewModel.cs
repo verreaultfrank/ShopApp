@@ -258,10 +258,13 @@ public partial class InventoryViewModel : ObservableObject
                 PageSize,
                 MapSortOption(SelectedSort));
 
-            foreach (var item in items)
+            MainThread.BeginInvokeOnMainThread(() =>
             {
-                StockItems.Add(item);
-            }
+                foreach (var item in items)
+                {
+                    StockItems.Add(item);
+                }
+            });
 
             if (items.Any())
             {

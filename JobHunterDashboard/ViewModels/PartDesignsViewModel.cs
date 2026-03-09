@@ -55,10 +55,13 @@ public partial class PartDesignsViewModel : ObservableObject
             }
             
             Parts.Clear();
-            foreach (var p in parts)
+            MainThread.BeginInvokeOnMainThread(() =>
             {
-                Parts.Add(p);
-            }
+                foreach (var p in parts)
+                {
+                    Parts.Add(p);
+                }
+            });
         }
         catch (Exception ex)
         {
