@@ -6,6 +6,7 @@
     xmlns:coremodels="clr-namespace:JobHunter.Domain.Models;assembly=JobHunter.Domain"
     xmlns:models="clr-namespace:JobHunterDashboard.Models"
     xmlns:viewmodels="clr-namespace:JobHunterDashboard.ViewModels"
+    x:Name="LeadDashboardPage"
     BackgroundColor="{DynamicResource AppBackgroundColor}"
     Shell.NavBarIsVisible="False">
 
@@ -255,7 +256,7 @@
                                         FontAttributes="Bold"
                                         FontSize="12"
                                         ItemDisplayBinding="{Binding Name}"
-                                        ItemsSource="{Binding Source={RelativeSource AncestorType={x:Type viewmodels:MainViewModel}}, Path=AvailableStatuses}"
+                                        ItemsSource="{Binding BindingContext.AvailableStatuses, Source={x:Reference LeadDashboardPage}}"
                                         SelectedIndexChanged="OnStatusSelectedIndexChanged"
                                         SelectedItem="{Binding Status, Mode=OneWay}"
                                         TextColor="{DynamicResource AppPrimaryColor}" />
@@ -297,7 +298,7 @@
                                                 FontSize="12"
                                                 HeightRequest="30"
                                                 ItemDisplayBinding="{Binding Name}"
-                                                ItemsSource="{Binding Source={RelativeSource AncestorType={x:Type viewmodels:MainViewModel}}, Path=AvailableBusinesses}"
+                                                ItemsSource="{Binding BindingContext.AvailableBusinesses, Source={x:Reference LeadDashboardPage}}"
                                                 SelectedIndexChanged="OnBusinessSelectedIndexChanged"
                                                 SelectedItem="{Binding Business, Mode=OneWay}"
                                                 TextColor="{DynamicResource AppPrimaryColor}" />

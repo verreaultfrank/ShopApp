@@ -12,6 +12,16 @@ public partial class MainPage : ContentPage
         BindingContext = viewModel;
     }
 
+    protected override async void OnAppearing()
+    {
+        base.OnAppearing();
+
+        if (BindingContext is MainViewModel viewModel)
+        {
+            await viewModel.InitializeAsync();
+        }
+    }
+
     private async void OnStatusSelectedIndexChanged(object sender, EventArgs e)
     {
         var picker = (Picker)sender;

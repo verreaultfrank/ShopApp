@@ -57,6 +57,8 @@ public partial class MainViewModel : ObservableObject
     [ObservableProperty]
     private string _searchText = "";
 
+    private bool _isInitialized;
+
     partial void OnSearchTextChanged(string value)
     {
         Preferences.Default.Set("SearchText", value);
@@ -73,10 +75,6 @@ public partial class MainViewModel : ObservableObject
 
         // Load persisted filter preferences (or default to All/Empty)
         _searchText = Preferences.Default.Get("SearchText", "");
-
-        // Statuses and Providers will be loaded from DB in InitializeAsync
-        // Load data from DB
-        _ = InitializeAsync();
     }
 
     [RelayCommand]
@@ -120,8 +118,11 @@ public partial class MainViewModel : ObservableObject
     [RelayCommand]
     private async Task ViewHistory(DashboardJobOpportunity job) => await ViewHistoryAsync(job);
 
-    private async Task InitializeAsync()
+    public async Task InitializeAsync()
     {
+        if (_isInitialized) return;
+        _isInitialized = true;
+
         // Load businesses from DB for provider filters and business picker
         var businessesFromDb = await _businessService.GetAllBusinessesAsync();
         string savedProviders = Preferences.Default.Get("SelectedProviders", "");
@@ -206,12 +207,6 @@ public partial class MainViewModel : ObservableObject
                 }
 
                 Jobs.Add(dashboardJob);
-
-                // Raise PropertyChanged AFTER adding to the collection so the Pickers
-                // (which exist only once the item is in the visual tree) re-evaluate
-                // their SelectedItem OneWay bindings against the aligned references.
-                dashboardJob.RaisePropertyChanged(nameof(dashboardJob.Business));
-                dashboardJob.RaisePropertyChanged(nameof(dashboardJob.Status));
             }
 
             if (domainLeads.Any())
