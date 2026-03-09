@@ -100,7 +100,7 @@ These skills acted as **persistent, reusable instructions** that kept the AI con
 | **Entity Framework Core** | ORM for data access |
 | **SQL Server** | Relational database |
 | **MVVM Pattern** | UI architecture (ViewModels, Commands, Bindings) |
-| **Gemini 2.5 Pro** | AI agent for architecture, domain modeling, and planning |
+| **Gemini 3.1 Pro** | AI agent for architecture, domain modeling, and planning |
 | **Claude Opus 4.6** | AI agent for rapid implementation and refactoring |
 
 ---
