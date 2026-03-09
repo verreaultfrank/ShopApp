@@ -1,0 +1,56 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<Shell
+    x:Class="JobHunterDashboard.AppShell"
+    xmlns="http://schemas.microsoft.com/dotnet/2021/maui"
+    xmlns:x="http://schemas.microsoft.com/winfx/2009/xaml"
+    xmlns:views="clr-namespace:JobHunterDashboard.Views"
+    Title="JobHunterDashboard"
+    Shell.FlyoutBehavior="Disabled"
+    Shell.NavBarIsVisible="False">
+
+    <TabBar>
+        <Tab Title="Leads">
+            <ShellContent
+                Title="Leads"
+                ContentTemplate="{DataTemplate views:MainPage}"
+                Route="MainPage" />
+        </Tab>
+        <Tab Title="Analytics">
+            <ShellContent
+                Title="Analytics"
+                ContentTemplate="{DataTemplate views:AnalyticsPage}"
+                Route="AnalyticsPage" />
+        </Tab>
+        <Tab Title="Parts">
+            <ShellContent
+                Title="Parts"
+                ContentTemplate="{DataTemplate views:PartDesignsPage}"
+                Route="PartDesignsPage" />
+        </Tab>
+        <Tab Title="Jobs">
+            <ShellContent
+                Title="Jobs"
+                ContentTemplate="{DataTemplate views:JobsPage}"
+                Route="JobsPage" />
+        </Tab>
+        <Tab Title="Shop">
+            <ShellContent
+                Title="Shop"
+                ContentTemplate="{DataTemplate views:ShopPage}"
+                Route="ShopPage" />
+        </Tab>
+        <Tab Title="Inventory">
+            <ShellContent
+                Title="Inventory"
+                ContentTemplate="{DataTemplate views:InventoryPage}"
+                Route="InventoryPage" />
+        </Tab>
+        <Tab Title="Settings">
+            <ShellContent
+                Title="Settings"
+                ContentTemplate="{DataTemplate views:SettingsPage}"
+                Route="SettingsPage" />
+        </Tab>
+    </TabBar>
+
+</Shell>

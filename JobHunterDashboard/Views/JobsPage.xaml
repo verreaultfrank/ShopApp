@@ -1,0 +1,25 @@
+<?xml version="1.0" encoding="utf-8" ?>
+<ContentPage xmlns="http://schemas.microsoft.com/dotnet/2021/maui"
+             xmlns:x="http://schemas.microsoft.com/winfx/2009/xaml"
+             x:Class="JobHunterDashboard.Views.JobsPage"
+             Title="Jobs"
+             BackgroundColor="{DynamicResource AppBackgroundColor}">
+    
+    <VerticalStackLayout Spacing="20" Padding="30" VerticalOptions="Center" HorizontalOptions="Center">
+        <Label Text="🛠️ Active Jobs Details"
+               FontSize="32"
+               FontAttributes="Bold"
+               TextColor="{DynamicResource AppPrimaryColor}"
+               HorizontalOptions="Center" />
+               
+        <Label Text="Explore detailed views for specific jobs. Access metrology reports, 3D models, manufacturing details, and quotes."
+               FontSize="16"
+               TextColor="{DynamicResource AppSubtextColor}"
+               HorizontalOptions="Center"
+               HorizontalTextAlignment="Center" />
+        
+        <Frame Padding="20" CornerRadius="10" BackgroundColor="{DynamicResource AppSurfaceColor}" BorderColor="{DynamicResource AppBorderColor}" Margin="0,20,0,0">
+            <Label Text="[ Generic Placeholder for Job Details Grid/List ]" TextColor="{DynamicResource AppSubtextColor}" HorizontalOptions="Center"/>
+        </Frame>
+    </VerticalStackLayout>
+</ContentPage>

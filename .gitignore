@@ -1,0 +1,123 @@
+### =============================================
+### .NET / C# / MAUI — .gitignore
+### =============================================
+
+## Build outputs
+[Oo]bj/
+[Bb]in/
+*.user
+*.suo
+*.userosscache
+*.sln.docstates
+
+## NuGet packages
+*.nupkg
+*.snupkg
+**/[Pp]ackages/
+!**/[Pp]ackages/build/
+project.lock.json
+project.fragment.lock.json
+artifacts/
+
+## .NET tools
+.dotnet/
+
+## MSBuild
+msbuildtemp/
+
+## Visual Studio
+.vs/
+*.aps
+*.ncb
+*.opendb
+*.opensdf
+*.sdf
+*.cachefile
+*.VC.db
+*.VC.opendb
+[Tt]est[Rr]esult*/
+[Bb]uild[Ll]og.*
+*.pidb
+*.svclog
+*.scc
+
+## Visual Studio Code
+.vscode/
+!.vscode/extensions.json
+
+## Rider / JetBrains
+.idea/
+*.sln.iml
+
+## Logs & diagnostics
+*.log
+*.tlog
+*.tlh
+*.tli
+crash.*.txt
+
+## =============================================
+## SECRETS — never commit these!
+## =============================================
+**/appsettings.json
+**/appsettings.*.json
+!**/appsettings.example.json
+!**/appsettings.*.example.json
+*.pfx
+*.p12
+*.pem
+*.key
+secrets.json
+**/.secrets/
+
+## =============================================
+## .NET MAUI / Xamarin
+## =============================================
+## Android
+**/[Aa]ndroid/[Aa]ssets/
+**/*.apk
+**/*.aab
+**/*.ap_
+**/*.dex
+
+## iOS
+**/[Ii][Oo][Ss]/[Bb]uild/
+**/*.ipa
+**/xcuserdata/
+**/*.xcworkspace/xcuserdata/
+**/*.pbxuser
+**/*.mode1v3
+**/*.mode2v3
+**/*.perspectivev3
+
+## Windows (WinUI / MSIX)
+**/*.msix
+**/*.msixbundle
+**/*.appx
+**/*.appxbundle
+AppPackages/
+BundleArtifacts/
+
+## Mac Catalyst
+**/*.dmg
+
+## =============================================
+## Other
+## =============================================
+## OS files
+.DS_Store
+Thumbs.db
+Desktop.ini
+
+## Temp / scratch
+tmp/
+temp/
+*.tmp
+*.temp
+*.bak
+*.swp
+*~
+
+## EF Core migrations SQL snapshots generated locally
+## (keep actual migration files but ignore designer-generated code if needed)
+# **/Migrations/*Designer.cs   # uncomment if you don't want to track these

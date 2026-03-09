@@ -1,0 +1,415 @@
+<?xml version="1.0" encoding="utf-8" ?>
+<ContentPage xmlns="http://schemas.microsoft.com/dotnet/2021/maui"
+             xmlns:x="http://schemas.microsoft.com/winfx/2009/xaml"
+             xmlns:vm="clr-namespace:JobHunterDashboard.ViewModels"
+             xmlns:models="clr-namespace:JobHunterDashboard.Models"
+             xmlns:domain="clr-namespace:JobHunter.Domain.Models;assembly=JobHunter.Domain"
+             x:Class="JobHunterDashboard.Views.InventoryPage"
+             x:DataType="vm:InventoryViewModel"
+             Title="Inventory"
+             BackgroundColor="{DynamicResource AppBackgroundColor}">
+
+    <Grid RowDefinitions="Auto, Auto, Auto, *">
+
+        <!-- ══════ Header + New Stock Button ══════ -->
+        <Grid Grid.Row="0" Margin="20,10,20,5" ColumnDefinitions="*, Auto">
+            <HorizontalStackLayout Grid.Column="0" Spacing="10" VerticalOptions="Center">
+                <Label Text="📦" FontSize="28" VerticalOptions="Center" />
+                <Label Text="Raw Material Inventory"
+                       FontSize="24" FontAttributes="Bold"
+                       TextColor="{DynamicResource AppTextColor}"
+                       VerticalOptions="Center" />
+            </HorizontalStackLayout>
+            <Button Grid.Column="1"
+                    Padding="14,6"
+                    BackgroundColor="{DynamicResource AppPrimaryColor}"
+                    Command="{Binding ShowCreateFormCommand}"
+                    CornerRadius="8"
+                    FontAttributes="Bold" FontSize="13"
+                    Text="＋ New Stock"
+                    TextColor="White"
+                    VerticalOptions="Center" />
+        </Grid>
+
+        <!-- ══════ Filters & Search Bar ══════ -->
+        <Border Grid.Row="1"
+                Margin="20,0,20,10" Padding="15,10"
+                BackgroundColor="{DynamicResource AppSurfaceColor}"
+                Stroke="{DynamicResource AppBorderColor}"
+                StrokeShape="RoundRectangle 8" StrokeThickness="1">
+
+            <Grid ColumnDefinitions="*, Auto, Auto, Auto" ColumnSpacing="15">
+
+                <!-- Search -->
+                <Frame Grid.Column="0" Padding="0"
+                       BackgroundColor="Transparent"
+                       BorderColor="{DynamicResource AppPrimaryColor}"
+                       CornerRadius="8" HasShadow="False" VerticalOptions="Start">
+                    <SearchBar Placeholder="Search material, type, or location..."
+                               PlaceholderColor="{DynamicResource AppSubtextColor}"
+                               Text="{Binding SearchText, Mode=TwoWay}"
+                               TextColor="{DynamicResource AppTextColor}" />
+                </Frame>
+
+                <!-- Stock Type (Profile Shape) Filter -->
+                <VerticalStackLayout Grid.Column="1" VerticalOptions="Start">
+                    <Label Margin="5,0,0,0" FontAttributes="Bold" FontSize="10"
+                           Text="Profile:" TextColor="{DynamicResource AppSubtextColor}" />
+                    <Border Padding="0" BackgroundColor="Transparent"
+                            MinimumWidthRequest="170"
+                            Stroke="{DynamicResource AppPrimaryColor}"
+                            StrokeShape="RoundRectangle 6" StrokeThickness="1">
+                        <VerticalStackLayout>
+                            <Button Padding="10,5" BackgroundColor="Transparent"
+                                    Command="{Binding ToggleTypeDropdownCommand}"
+                                    FontAttributes="Bold" FontSize="12" HeightRequest="35"
+                                    Text="Profile Shape ▾"
+                                    TextColor="{DynamicResource AppPrimaryColor}" />
+                            <CollectionView Margin="5,0,5,5"
+                                            IsVisible="{Binding IsTypeDropdownOpen}"
+                                            ItemsSource="{Binding StockTypeFilters}"
+                                            MaximumHeightRequest="350">
+                                <CollectionView.ItemTemplate>
+                                    <DataTemplate x:DataType="models:FilterItem">
+                                        <HorizontalStackLayout Margin="0,2" Spacing="5" VerticalOptions="Center">
+                                            <CheckBox IsChecked="{Binding IsSelected}" VerticalOptions="Center"
+                                                      Color="{DynamicResource AppPrimaryColor}" />
+                                            <Label FontSize="12" Text="{Binding Name}"
+                                                   TextColor="{DynamicResource AppTextColor}" VerticalOptions="Center" />
+                                        </HorizontalStackLayout>
+                                    </DataTemplate>
+                                </CollectionView.ItemTemplate>
+                            </CollectionView>
+                        </VerticalStackLayout>
+                    </Border>
+                </VerticalStackLayout>
+
+                <!-- Material Category Filter -->
+                <VerticalStackLayout Grid.Column="2" VerticalOptions="Start">
+                    <Label Margin="5,0,0,0" FontAttributes="Bold" FontSize="10"
+                           Text="Material:" TextColor="{DynamicResource AppSubtextColor}" />
+                    <Border Padding="0" BackgroundColor="Transparent"
+                            MinimumWidthRequest="160"
+                            Stroke="{DynamicResource AppPrimaryColor}"
+                            StrokeShape="RoundRectangle 6" StrokeThickness="1">
+                        <VerticalStackLayout>
+                            <Button Padding="10,5" BackgroundColor="Transparent"
+                                    Command="{Binding ToggleMaterialDropdownCommand}"
+                                    FontAttributes="Bold" FontSize="12" HeightRequest="35"
+                                    Text="Material ▾"
+                                    TextColor="{DynamicResource AppPrimaryColor}" />
+                            <CollectionView Margin="5,0,5,5"
+                                            IsVisible="{Binding IsMaterialDropdownOpen}"
+                                            ItemsSource="{Binding MaterialCategoryFilters}"
+                                            MaximumHeightRequest="250">
+                                <CollectionView.ItemTemplate>
+                                    <DataTemplate x:DataType="models:FilterItem">
+                                        <HorizontalStackLayout Margin="0,2" Spacing="5" VerticalOptions="Center">
+                                            <CheckBox IsChecked="{Binding IsSelected}" VerticalOptions="Center"
+                                                      Color="{DynamicResource AppPrimaryColor}" />
+                                            <Label FontSize="12" Text="{Binding Name}"
+                                                   TextColor="{DynamicResource AppTextColor}" VerticalOptions="Center" />
+                                        </HorizontalStackLayout>
+                                    </DataTemplate>
+                                </CollectionView.ItemTemplate>
+                            </CollectionView>
+                        </VerticalStackLayout>
+                    </Border>
+                </VerticalStackLayout>
+
+                <!-- Sort Picker -->
+                <VerticalStackLayout Grid.Column="3" VerticalOptions="Start">
+                    <Label Margin="5,0,0,0" FontAttributes="Bold" FontSize="10"
+                           Text="Sort By:" TextColor="{DynamicResource AppSubtextColor}" />
+                    <Border Padding="5,0" BackgroundColor="Transparent"
+                            MinimumWidthRequest="160"
+                            Stroke="{DynamicResource AppPrimaryColor}"
+                            StrokeShape="RoundRectangle 6" StrokeThickness="1">
+                        <Picker FontAttributes="Bold" FontSize="12" HeightRequest="35"
+                                ItemsSource="{Binding SortOptions}"
+                                SelectedItem="{Binding SelectedSort}"
+                                TextColor="{DynamicResource AppPrimaryColor}" />
+                    </Border>
+                </VerticalStackLayout>
+
+            </Grid>
+        </Border>
+
+        <!-- ══════ Inline Create/Edit Form ══════ -->
+        <Border Grid.Row="2"
+                Margin="20,0,20,10" Padding="20"
+                BackgroundColor="{DynamicResource AppSurfaceColor}"
+                IsVisible="{Binding IsFormVisible}"
+                Stroke="{DynamicResource AppPrimaryColor}"
+                StrokeShape="RoundRectangle 10" StrokeThickness="2">
+            <VerticalStackLayout Spacing="12">
+                <Label Text="{Binding FormTitle}"
+                       FontSize="18" FontAttributes="Bold"
+                       TextColor="{DynamicResource AppPrimaryColor}" />
+
+                <!-- Row 1: Type + Material -->
+                <Grid ColumnDefinitions="*, *" ColumnSpacing="15">
+                    <VerticalStackLayout Grid.Column="0">
+                        <Label Text="Stock Type" FontSize="11" FontAttributes="Bold"
+                               TextColor="{DynamicResource AppSubtextColor}" />
+                        <Border Padding="5,0" Stroke="{DynamicResource AppBorderColor}"
+                                StrokeShape="RoundRectangle 6" StrokeThickness="1">
+                            <Picker ItemsSource="{Binding StockTypesList}"
+                                    ItemDisplayBinding="{Binding Name}"
+                                    SelectedItem="{Binding FormStockType}"
+                                    TextColor="{DynamicResource AppTextColor}" HeightRequest="35" />
+                        </Border>
+                    </VerticalStackLayout>
+                    <VerticalStackLayout Grid.Column="1">
+                        <Label Text="Material" FontSize="11" FontAttributes="Bold"
+                               TextColor="{DynamicResource AppSubtextColor}" />
+                        <Border Padding="5,0" Stroke="{DynamicResource AppBorderColor}"
+                                StrokeShape="RoundRectangle 6" StrokeThickness="1">
+                            <Picker ItemsSource="{Binding Materials}"
+                                    ItemDisplayBinding="{Binding Name}"
+                                    SelectedItem="{Binding FormMaterial}"
+                                    TextColor="{DynamicResource AppTextColor}" HeightRequest="35" />
+                        </Border>
+                    </VerticalStackLayout>
+                </Grid>
+
+                <!-- Row 2: Dimensions -->
+                <Label Text="Dimensions (inches)" FontSize="11" FontAttributes="Bold"
+                       TextColor="{DynamicResource AppSubtextColor}" />
+                <Grid ColumnDefinitions="*,*,*,*,*,*" ColumnSpacing="10">
+                    <VerticalStackLayout Grid.Column="0">
+                        <Label Text="OD" FontSize="10" TextColor="{DynamicResource AppSubtextColor}" />
+                        <Entry Text="{Binding FormOD}" Keyboard="Numeric"
+                               TextColor="{DynamicResource AppTextColor}" BackgroundColor="Transparent"
+                               Placeholder="—" PlaceholderColor="{DynamicResource AppBorderColor}" />
+                    </VerticalStackLayout>
+                    <VerticalStackLayout Grid.Column="1">
+                        <Label Text="ID" FontSize="10" TextColor="{DynamicResource AppSubtextColor}" />
+                        <Entry Text="{Binding FormID}" Keyboard="Numeric"
+                               TextColor="{DynamicResource AppTextColor}" BackgroundColor="Transparent"
+                               Placeholder="—" PlaceholderColor="{DynamicResource AppBorderColor}" />
+                    </VerticalStackLayout>
+                    <VerticalStackLayout Grid.Column="2">
+                        <Label Text="Wall" FontSize="10" TextColor="{DynamicResource AppSubtextColor}" />
+                        <Entry Text="{Binding FormWall}" Keyboard="Numeric"
+                               TextColor="{DynamicResource AppTextColor}" BackgroundColor="Transparent"
+                               Placeholder="—" PlaceholderColor="{DynamicResource AppBorderColor}" />
+                    </VerticalStackLayout>
+                    <VerticalStackLayout Grid.Column="3">
+                        <Label Text="Width" FontSize="10" TextColor="{DynamicResource AppSubtextColor}" />
+                        <Entry Text="{Binding FormWidth}" Keyboard="Numeric"
+                               TextColor="{DynamicResource AppTextColor}" BackgroundColor="Transparent"
+                               Placeholder="—" PlaceholderColor="{DynamicResource AppBorderColor}" />
+                    </VerticalStackLayout>
+                    <VerticalStackLayout Grid.Column="4">
+                        <Label Text="Height" FontSize="10" TextColor="{DynamicResource AppSubtextColor}" />
+                        <Entry Text="{Binding FormHeight}" Keyboard="Numeric"
+                               TextColor="{DynamicResource AppTextColor}" BackgroundColor="Transparent"
+                               Placeholder="—" PlaceholderColor="{DynamicResource AppBorderColor}" />
+                    </VerticalStackLayout>
+                    <VerticalStackLayout Grid.Column="5">
+                        <Label Text="Thickness" FontSize="10" TextColor="{DynamicResource AppSubtextColor}" />
+                        <Entry Text="{Binding FormThickness}" Keyboard="Numeric"
+                               TextColor="{DynamicResource AppTextColor}" BackgroundColor="Transparent"
+                               Placeholder="—" PlaceholderColor="{DynamicResource AppBorderColor}" />
+                    </VerticalStackLayout>
+                </Grid>
+                <Grid ColumnDefinitions="*,*,*,*,*,*" ColumnSpacing="10">
+                    <VerticalStackLayout Grid.Column="0">
+                        <Label Text="Length" FontSize="10" TextColor="{DynamicResource AppSubtextColor}" />
+                        <Entry Text="{Binding FormLength}" Keyboard="Numeric"
+                               TextColor="{DynamicResource AppTextColor}" BackgroundColor="Transparent"
+                               Placeholder="—" PlaceholderColor="{DynamicResource AppBorderColor}" />
+                    </VerticalStackLayout>
+                    <VerticalStackLayout Grid.Column="1">
+                        <Label Text="Across Flats" FontSize="10" TextColor="{DynamicResource AppSubtextColor}" />
+                        <Entry Text="{Binding FormAcrossFlats}" Keyboard="Numeric"
+                               TextColor="{DynamicResource AppTextColor}" BackgroundColor="Transparent"
+                               Placeholder="—" PlaceholderColor="{DynamicResource AppBorderColor}" />
+                    </VerticalStackLayout>
+                    <VerticalStackLayout Grid.Column="2">
+                        <Label Text="Leg Length" FontSize="10" TextColor="{DynamicResource AppSubtextColor}" />
+                        <Entry Text="{Binding FormLegLength}" Keyboard="Numeric"
+                               TextColor="{DynamicResource AppTextColor}" BackgroundColor="Transparent"
+                               Placeholder="—" PlaceholderColor="{DynamicResource AppBorderColor}" />
+                    </VerticalStackLayout>
+                    <VerticalStackLayout Grid.Column="3">
+                        <Label Text="Leg Width" FontSize="10" TextColor="{DynamicResource AppSubtextColor}" />
+                        <Entry Text="{Binding FormLegWidth}" Keyboard="Numeric"
+                               TextColor="{DynamicResource AppTextColor}" BackgroundColor="Transparent"
+                               Placeholder="—" PlaceholderColor="{DynamicResource AppBorderColor}" />
+                    </VerticalStackLayout>
+                    <VerticalStackLayout Grid.Column="4">
+                        <Label Text="Flange W" FontSize="10" TextColor="{DynamicResource AppSubtextColor}" />
+                        <Entry Text="{Binding FormFlangeWidth}" Keyboard="Numeric"
+                               TextColor="{DynamicResource AppTextColor}" BackgroundColor="Transparent"
+                               Placeholder="—" PlaceholderColor="{DynamicResource AppBorderColor}" />
+                    </VerticalStackLayout>
+                    <VerticalStackLayout Grid.Column="5">
+                        <Label Text="Web Depth" FontSize="10" TextColor="{DynamicResource AppSubtextColor}" />
+                        <Entry Text="{Binding FormWebDepth}" Keyboard="Numeric"
+                               TextColor="{DynamicResource AppTextColor}" BackgroundColor="Transparent"
+                               Placeholder="—" PlaceholderColor="{DynamicResource AppBorderColor}" />
+                    </VerticalStackLayout>
+                </Grid>
+
+                <!-- Row 3: Quantity + Location -->
+                <Grid ColumnDefinitions="Auto, *, Auto, Auto" ColumnSpacing="15">
+                    <VerticalStackLayout Grid.Column="0" MinimumWidthRequest="80">
+                        <Label Text="Quantity" FontSize="11" FontAttributes="Bold"
+                               TextColor="{DynamicResource AppSubtextColor}" />
+                        <Entry Text="{Binding FormQuantity}" Keyboard="Numeric"
+                               TextColor="{DynamicResource AppTextColor}" BackgroundColor="Transparent" />
+                    </VerticalStackLayout>
+                    <VerticalStackLayout Grid.Column="1">
+                        <Label Text="Location" FontSize="11" FontAttributes="Bold"
+                               TextColor="{DynamicResource AppSubtextColor}" />
+                        <Entry Text="{Binding FormLocation}"
+                               Placeholder="e.g. Rack A-1"
+                               PlaceholderColor="{DynamicResource AppBorderColor}"
+                               TextColor="{DynamicResource AppTextColor}" BackgroundColor="Transparent" />
+                    </VerticalStackLayout>
+                    <Button Grid.Column="2"
+                            Padding="18,6" Margin="0,14,0,0"
+                            BackgroundColor="{DynamicResource AppPrimaryColor}"
+                            Command="{Binding SaveFormCommand}"
+                            CornerRadius="8" FontAttributes="Bold" FontSize="13"
+                            Text="💾 Save" TextColor="White"
+                            VerticalOptions="End" />
+                    <Button Grid.Column="3"
+                            Padding="14,6" Margin="0,14,0,0"
+                            BackgroundColor="Transparent"
+                            BorderColor="{DynamicResource AppSubtextColor}"
+                            BorderWidth="1"
+                            Command="{Binding CancelFormCommand}"
+                            CornerRadius="8" FontSize="13"
+                            Text="Cancel" TextColor="{DynamicResource AppSubtextColor}"
+                            VerticalOptions="End" />
+                </Grid>
+            </VerticalStackLayout>
+        </Border>
+
+        <!-- ══════ Stock Items Grid ══════ -->
+        <ContentView Grid.Row="3" Padding="20,0,20,20">
+            <CollectionView ItemsSource="{Binding StockItems}"
+                            RemainingItemsThreshold="5"
+                            RemainingItemsThresholdReachedCommand="{Binding LoadMoreCommand}">
+                <CollectionView.ItemTemplate>
+                    <DataTemplate x:DataType="domain:StockItem">
+                        <!-- Card -->
+                        <Border Margin="0,0,0,10"
+                                BackgroundColor="{DynamicResource AppSurfaceColor}"
+                                Stroke="{DynamicResource AppBorderColor}"
+                                StrokeShape="RoundRectangle 10" StrokeThickness="1">
+                            <Border.Shadow>
+                                <Shadow Brush="{DynamicResource AppTextColor}" Opacity="0.03" Radius="4" Offset="0,2" />
+                            </Border.Shadow>
+
+                            <Grid Padding="16" ColumnDefinitions="Auto, *, Auto, Auto, Auto"
+                                  RowDefinitions="Auto, Auto, Auto">
+
+                                <!-- Type badge -->
+                                <Border Grid.Row="0" Grid.Column="0"
+                                        Padding="10,4" Margin="0,0,12,0"
+                                        BackgroundColor="{DynamicResource AppPrimaryColor}"
+                                        StrokeShape="RoundRectangle 10" StrokeThickness="0"
+                                        VerticalOptions="Center">
+                                    <Label FontSize="11" FontAttributes="Bold"
+                                           Text="{Binding StockType.Name}"
+                                           TextColor="White" />
+                                </Border>
+
+                                <!-- Material name -->
+                                <Label Grid.Row="0" Grid.Column="1"
+                                       FontSize="16" FontAttributes="Bold"
+                                       Text="{Binding Material.Name}"
+                                       TextColor="{DynamicResource AppTextColor}"
+                                       VerticalOptions="Center"
+                                       LineBreakMode="TailTruncation" />
+
+                                <!-- Quantity -->
+                                <HorizontalStackLayout Grid.Row="0" Grid.Column="2" Spacing="4" VerticalOptions="Center" Margin="0,0,10,0">
+                                    <Label FontSize="11" FontAttributes="Bold"
+                                           Text="Qty:" TextColor="{DynamicResource AppSubtextColor}" />
+                                    <Label FontSize="14" FontAttributes="Bold"
+                                           Text="{Binding Quantity}"
+                                           TextColor="{DynamicResource AppPrimaryColor}" />
+                                </HorizontalStackLayout>
+
+                                <!-- Edit Button -->
+                                <Button Grid.Row="0" Grid.Column="3"
+                                        Padding="8,4" Margin="0,0,5,0"
+                                        BackgroundColor="Transparent"
+                                        BorderColor="{DynamicResource AppPrimaryColor}"
+                                        BorderWidth="1"
+                                        Command="{Binding Source={RelativeSource AncestorType={x:Type vm:InventoryViewModel}}, Path=EditCommand}"
+                                        CommandParameter="{Binding .}"
+                                        CornerRadius="6" FontSize="11"
+                                        Text="✏️" TextColor="{DynamicResource AppPrimaryColor}"
+                                        VerticalOptions="Center"
+                                        MinimumWidthRequest="36" MinimumHeightRequest="30" />
+
+                                <!-- Delete Button -->
+                                <Button Grid.Row="0" Grid.Column="4"
+                                        Padding="8,4"
+                                        BackgroundColor="Transparent"
+                                        BorderColor="#E74C3C"
+                                        BorderWidth="1"
+                                        Command="{Binding Source={RelativeSource AncestorType={x:Type vm:InventoryViewModel}}, Path=DeleteCommand}"
+                                        CommandParameter="{Binding .}"
+                                        CornerRadius="6" FontSize="11"
+                                        Text="🗑️" TextColor="#E74C3C"
+                                        VerticalOptions="Center"
+                                        MinimumWidthRequest="36" MinimumHeightRequest="30" />
+
+                                <!-- Dimensions row -->
+                                <HorizontalStackLayout Grid.Row="1" Grid.Column="0" Grid.ColumnSpan="5"
+                                                       Margin="0,8,0,0" Spacing="8">
+                                    <Label FontSize="11" FontAttributes="Bold"
+                                           Text="Dims:" TextColor="{DynamicResource AppSubtextColor}"
+                                           VerticalOptions="Center" />
+                                    <Frame Padding="8,3" BackgroundColor="{DynamicResource AppBorderColor}"
+                                           CornerRadius="10" HasShadow="False">
+                                        <Label FontSize="11"
+                                               Text="{Binding DimensionSummary}"
+                                               TextColor="{DynamicResource AppTextColor}" />
+                                    </Frame>
+                                </HorizontalStackLayout>
+
+                                <!-- Bottom row: Material category + temper + location -->
+                                <HorizontalStackLayout Grid.Row="2" Grid.Column="0" Grid.ColumnSpan="5"
+                                                       Margin="0,6,0,0" Spacing="12">
+                                    <HorizontalStackLayout Spacing="4">
+                                        <Label FontSize="10" FontAttributes="Bold"
+                                               Text="Category:" TextColor="{DynamicResource AppSubtextColor}"
+                                               VerticalOptions="Center" />
+                                        <Label FontSize="10" Text="{Binding Material.Category}"
+                                               TextColor="{DynamicResource AppTextColor}"
+                                               VerticalOptions="Center" />
+                                    </HorizontalStackLayout>
+                                    <HorizontalStackLayout Spacing="4">
+                                        <Label FontSize="10" FontAttributes="Bold"
+                                               Text="Temper:" TextColor="{DynamicResource AppSubtextColor}"
+                                               VerticalOptions="Center" />
+                                        <Label FontSize="10" Text="{Binding Material.TemperCondition}"
+                                               TextColor="{DynamicResource AppTextColor}"
+                                               VerticalOptions="Center" />
+                                    </HorizontalStackLayout>
+                                    <HorizontalStackLayout Spacing="4">
+                                        <Label FontSize="10" FontAttributes="Bold"
+                                               Text="📍" TextColor="{DynamicResource AppSubtextColor}"
+                                               VerticalOptions="Center" />
+                                        <Label FontSize="10" Text="{Binding Location}"
+                                               TextColor="{DynamicResource AppTextColor}"
+                                               VerticalOptions="Center" />
+                                    </HorizontalStackLayout>
+                                </HorizontalStackLayout>
+                            </Grid>
+                        </Border>
+                    </DataTemplate>
+                </CollectionView.ItemTemplate>
+            </CollectionView>
+        </ContentView>
+
+    </Grid>
+</ContentPage>

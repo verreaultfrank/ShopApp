@@ -1,0 +1,489 @@
+<?xml version="1.0" encoding="utf-8" ?>
+<ContentPage
+    x:Class="JobHunterDashboard.Views.MainPage"
+    xmlns="http://schemas.microsoft.com/dotnet/2021/maui"
+    xmlns:x="http://schemas.microsoft.com/winfx/2009/xaml"
+    xmlns:coremodels="clr-namespace:JobHunter.Domain.Models;assembly=JobHunter.Domain"
+    xmlns:models="clr-namespace:JobHunterDashboard.Models"
+    xmlns:viewmodels="clr-namespace:JobHunterDashboard.ViewModels"
+    BackgroundColor="{DynamicResource AppBackgroundColor}"
+    Shell.NavBarIsVisible="False">
+
+    <Grid RowDefinitions="Auto, Auto, *">
+
+        <Label
+            Grid.Row="0"
+            Margin="20,10,20,0"
+            FontAttributes="Bold"
+            IsVisible="{Binding HasError}"
+            Text="{Binding ErrorMessage}"
+            TextColor="Red" />
+
+        <!--  Search & Filter Controls  -->
+        <Border
+            Grid.Row="1"
+            Margin="20,0,20,15"
+            Padding="15,10"
+            BackgroundColor="{DynamicResource AppSurfaceColor}"
+            Stroke="{DynamicResource AppBorderColor}"
+            StrokeShape="RoundRectangle 8"
+            StrokeThickness="1">
+
+            <Grid ColumnDefinitions="*, Auto, Auto, Auto, Auto" ColumnSpacing="15">
+                <!--  Search Bar  -->
+                <Frame
+                    Grid.Column="0"
+                    Padding="0"
+                    BackgroundColor="Transparent"
+                    BorderColor="{DynamicResource AppPrimaryColor}"
+                    CornerRadius="8"
+                    HasShadow="False"
+                    VerticalOptions="Start">
+                    <SearchBar
+                        Placeholder="Search via title or description..."
+                        PlaceholderColor="{DynamicResource AppSubtextColor}"
+                        Text="{Binding SearchText, Mode=TwoWay}"
+                        TextColor="{DynamicResource AppTextColor}" />
+                </Frame>
+
+                <!--  Provider Filter  -->
+                <VerticalStackLayout Grid.Column="1" VerticalOptions="Start">
+                    <Label
+                        Margin="5,0,0,0"
+                        FontAttributes="Bold"
+                        FontSize="10"
+                        Text="Provider:"
+                        TextColor="{DynamicResource AppSubtextColor}" />
+                    <Border
+                        Padding="0"
+                        BackgroundColor="Transparent"
+                        MinimumWidthRequest="160"
+                        Stroke="{DynamicResource AppPrimaryColor}"
+                        StrokeShape="RoundRectangle 6"
+                        StrokeThickness="1">
+                        <VerticalStackLayout>
+                            <Button
+                                Padding="10,5"
+                                BackgroundColor="Transparent"
+                                Command="{Binding ToggleProviderDropdownCommand}"
+                                FontAttributes="Bold"
+                                FontSize="12"
+                                HeightRequest="35"
+                                Text="Select Providers ▾"
+                                TextColor="{DynamicResource AppPrimaryColor}" />
+                            <CollectionView
+                                Margin="5,0,5,5"
+                                IsVisible="{Binding IsProviderDropdownOpen}"
+                                ItemsSource="{Binding ProviderFilters}"
+                                MaximumHeightRequest="200">
+                                <CollectionView.ItemTemplate>
+                                    <DataTemplate x:DataType="models:FilterItem">
+                                        <HorizontalStackLayout
+                                            Margin="0,2"
+                                            Spacing="5"
+                                            VerticalOptions="Center">
+                                            <CheckBox
+                                                IsChecked="{Binding IsSelected}"
+                                                VerticalOptions="Center"
+                                                Color="{DynamicResource AppPrimaryColor}" />
+                                            <Label
+                                                FontSize="12"
+                                                Text="{Binding Name}"
+                                                TextColor="{DynamicResource AppTextColor}"
+                                                VerticalOptions="Center" />
+                                        </HorizontalStackLayout>
+                                    </DataTemplate>
+                                </CollectionView.ItemTemplate>
+                            </CollectionView>
+                        </VerticalStackLayout>
+                    </Border>
+                </VerticalStackLayout>
+
+                <!--  Status Filter  -->
+                <VerticalStackLayout Grid.Column="2" VerticalOptions="Start">
+                    <Label
+                        Margin="5,0,0,0"
+                        FontAttributes="Bold"
+                        FontSize="10"
+                        Text="Status:"
+                        TextColor="{DynamicResource AppSubtextColor}" />
+                    <Border
+                        Padding="0"
+                        BackgroundColor="Transparent"
+                        MinimumWidthRequest="140"
+                        Stroke="{DynamicResource AppPrimaryColor}"
+                        StrokeShape="RoundRectangle 6"
+                        StrokeThickness="1">
+                        <VerticalStackLayout>
+                            <Button
+                                Padding="10,5"
+                                BackgroundColor="Transparent"
+                                Command="{Binding ToggleStatusDropdownCommand}"
+                                FontAttributes="Bold"
+                                FontSize="12"
+                                HeightRequest="35"
+                                Text="Select Statuses ▾"
+                                TextColor="{DynamicResource AppPrimaryColor}" />
+                            <CollectionView
+                                Margin="5,0,5,5"
+                                IsVisible="{Binding IsStatusDropdownOpen}"
+                                ItemsSource="{Binding StatusFilters}"
+                                MaximumHeightRequest="250">
+                                <CollectionView.ItemTemplate>
+                                    <DataTemplate x:DataType="models:FilterItem">
+                                        <HorizontalStackLayout
+                                            Margin="0,2"
+                                            Spacing="5"
+                                            VerticalOptions="Center">
+                                            <CheckBox
+                                                IsChecked="{Binding IsSelected}"
+                                                VerticalOptions="Center"
+                                                Color="{DynamicResource AppPrimaryColor}" />
+                                            <Label
+                                                FontSize="12"
+                                                Text="{Binding Name}"
+                                                TextColor="{DynamicResource AppTextColor}"
+                                                VerticalOptions="Center" />
+                                        </HorizontalStackLayout>
+                                    </DataTemplate>
+                                </CollectionView.ItemTemplate>
+                            </CollectionView>
+                        </VerticalStackLayout>
+                    </Border>
+                </VerticalStackLayout>
+
+                <!--  Sort By Picker  -->
+                <VerticalStackLayout Grid.Column="3" VerticalOptions="Start">
+                    <Label
+                        Margin="5,0,0,0"
+                        FontAttributes="Bold"
+                        FontSize="10"
+                        Text="Sort By:"
+                        TextColor="{DynamicResource AppSubtextColor}" />
+                    <Border
+                        Padding="5,0"
+                        BackgroundColor="Transparent"
+                        MinimumWidthRequest="140"
+                        Stroke="{DynamicResource AppPrimaryColor}"
+                        StrokeShape="RoundRectangle 6"
+                        StrokeThickness="1">
+                        <Picker
+                            FontAttributes="Bold"
+                            FontSize="12"
+                            HeightRequest="35"
+                            ItemDisplayBinding="{Binding ., Converter={StaticResource EnumDescriptionConverter}}"
+                            ItemsSource="{Binding SortOptions}"
+                            SelectedItem="{Binding SelectedSortOption}"
+                            TextColor="{DynamicResource AppPrimaryColor}" />
+                    </Border>
+                </VerticalStackLayout>
+
+                <!--  Fetch Leads Button  -->
+                <VerticalStackLayout Grid.Column="4" VerticalOptions="Start">
+                    <Label
+                        Margin="5,0,0,0"
+                        FontSize="10"
+                        Text="Sync:"
+                        TextColor="Transparent" />
+                    <Button
+                        Padding="10,5"
+                        BackgroundColor="{DynamicResource AppPrimaryColor}"
+                        Command="{Binding FetchLeadsCommand}"
+                        CornerRadius="8"
+                        FontAttributes="Bold"
+                        HeightRequest="35"
+                        MinimumWidthRequest="45"
+                        SemanticProperties.Description="Fetch New Leads"
+                        Text="🔄"
+                        TextColor="{DynamicResource AppSurfaceColor}"
+                        ToolTipProperties.Text="Fetch New Leads"
+                        VerticalOptions="Center" />
+                </VerticalStackLayout>
+            </Grid>
+        </Border>
+
+        <!--  Premium Job Listings  -->
+        <ContentView Grid.Row="2" Padding="20,0,20,20">
+            <CollectionView
+                ItemsSource="{Binding Jobs}"
+                RemainingItemsThreshold="5"
+                RemainingItemsThresholdReachedCommand="{Binding LoadMoreCommand}">
+                <CollectionView.ItemTemplate>
+                    <DataTemplate x:DataType="models:DashboardJobOpportunity">
+
+                        <!--  Elevated Card  -->
+                        <Border
+                            Margin="0,0,0,15"
+                            BackgroundColor="{DynamicResource AppSurfaceColor}"
+                            Stroke="{DynamicResource AppBorderColor}"
+                            StrokeShape="RoundRectangle 12"
+                            StrokeThickness="1">
+                            <Border.Shadow>
+                                <Shadow
+                                    Brush="{DynamicResource AppTextColor}"
+                                    Opacity="0.03"
+                                    Radius="6"
+                                    Offset="0,2" />
+                            </Border.Shadow>
+
+                            <Grid
+                                Padding="20"
+                                ColumnDefinitions="*, Auto, Auto"
+                                RowDefinitions="Auto, Auto, Auto, Auto, Auto">
+
+                                <Label
+                                    Grid.Row="0"
+                                    Grid.Column="0"
+                                    FontAttributes="Bold"
+                                    FontSize="18"
+                                    LineBreakMode="TailTruncation"
+                                    Text="{Binding Title}"
+                                    TextColor="{DynamicResource AppTextColor}" />
+
+                                <!--  Integrated Modern Picker  -->
+                                <Border
+                                    Grid.Row="0"
+                                    Grid.Column="1"
+                                    Margin="0,0,15,0"
+                                    Padding="5,0"
+                                    BackgroundColor="Transparent"
+                                    Stroke="{DynamicResource AppPrimaryColor}"
+                                    StrokeShape="RoundRectangle 8"
+                                    StrokeThickness="1"
+                                    VerticalOptions="Center">
+                                    <Picker
+                                        FontAttributes="Bold"
+                                        FontSize="12"
+                                        ItemDisplayBinding="{Binding Name}"
+                                        ItemsSource="{Binding Source={RelativeSource AncestorType={x:Type viewmodels:MainViewModel}}, Path=AvailableStatuses}"
+                                        SelectedIndexChanged="OnStatusSelectedIndexChanged"
+                                        SelectedItem="{Binding Status, Mode=OneWay}"
+                                        TextColor="{DynamicResource AppPrimaryColor}" />
+                                </Border>
+
+                                <Label
+                                    Grid.Row="0"
+                                    Grid.Column="2"
+                                    FontSize="12"
+                                    Text="{Binding Id}"
+                                    TextColor="{DynamicResource AppSubtextColor}"
+                                    VerticalOptions="Center" />
+
+                                <HorizontalStackLayout
+                                    Grid.Row="1"
+                                    Grid.Column="0"
+                                    Grid.ColumnSpan="3"
+                                    Margin="0,10,0,0"
+                                    Spacing="10">
+
+                                    <!--  Business Picker  -->
+                                    <HorizontalStackLayout Spacing="5" VerticalOptions="Center">
+                                        <Label
+                                            FontAttributes="Bold"
+                                            FontSize="12"
+                                            Text="Business:"
+                                            TextColor="{DynamicResource AppSubtextColor}"
+                                            VerticalOptions="Center" />
+                                        <Border
+                                            Padding="5,0"
+                                            BackgroundColor="Transparent"
+                                            MinimumWidthRequest="160"
+                                            Stroke="{DynamicResource AppPrimaryColor}"
+                                            StrokeShape="RoundRectangle 6"
+                                            StrokeThickness="1"
+                                            VerticalOptions="Center">
+                                            <Picker
+                                                FontAttributes="Bold"
+                                                FontSize="12"
+                                                HeightRequest="30"
+                                                ItemDisplayBinding="{Binding Name}"
+                                                ItemsSource="{Binding Source={RelativeSource AncestorType={x:Type viewmodels:MainViewModel}}, Path=AvailableBusinesses}"
+                                                SelectedIndexChanged="OnBusinessSelectedIndexChanged"
+                                                SelectedItem="{Binding Business, Mode=OneWay}"
+                                                TextColor="{DynamicResource AppPrimaryColor}" />
+                                        </Border>
+                                    </HorizontalStackLayout>
+
+                                    <!--  Preferred Contact Picker  -->
+                                    <HorizontalStackLayout Spacing="5" VerticalOptions="Center">
+                                        <Label
+                                            FontAttributes="Bold"
+                                            FontSize="12"
+                                            Text="Contact:"
+                                            TextColor="{DynamicResource AppSubtextColor}"
+                                            VerticalOptions="Center" />
+                                        <Border
+                                            Padding="5,0"
+                                            BackgroundColor="Transparent"
+                                            MinimumWidthRequest="160"
+                                            Stroke="{DynamicResource AppPrimaryColor}"
+                                            StrokeShape="RoundRectangle 6"
+                                            StrokeThickness="1"
+                                            VerticalOptions="Center">
+                                            <Picker
+                                                FontAttributes="Bold"
+                                                FontSize="12"
+                                                HeightRequest="30"
+                                                ItemDisplayBinding="{Binding FullName}"
+                                                ItemsSource="{Binding Business.Contacts}"
+                                                SelectedIndexChanged="OnPreferredContactSelectedIndexChanged"
+                                                SelectedItem="{Binding PreferredContact, Mode=OneWay}"
+                                                TextColor="{DynamicResource AppPrimaryColor}" />
+                                        </Border>
+                                    </HorizontalStackLayout>
+
+                                    <Label
+                                        Margin="0,0,5,0"
+                                        Text="Closes:"
+                                        TextColor="{DynamicResource AppSubtextColor}"
+                                        VerticalOptions="Center" />
+                                    <Label
+                                        Margin="0,0,15,0"
+                                        Text="{Binding ClosingDate, StringFormat='{0:MMM dd, yyyy}'}"
+                                        TextColor="{DynamicResource AppTextColor}"
+                                        VerticalOptions="Center" />
+
+                                    <Label
+                                        Margin="0,0,5,0"
+                                        Text="Fetched:"
+                                        TextColor="{DynamicResource AppSubtextColor}"
+                                        VerticalOptions="Center" />
+                                    <Label
+                                        Text="{Binding DateFetched, StringFormat='{0:MMM dd, yyyy}'}"
+                                        TextColor="{DynamicResource AppTextColor}"
+                                        VerticalOptions="Center" />
+                                </HorizontalStackLayout>
+
+                                <HorizontalStackLayout
+                                    Grid.Row="2"
+                                    Grid.Column="0"
+                                    Grid.ColumnSpan="3"
+                                    Margin="0,10,0,0"
+                                    Spacing="5">
+                                    <Label
+                                        FontAttributes="Bold"
+                                        FontSize="12"
+                                        Text="Asked Price:"
+                                        TextColor="{DynamicResource AppSubtextColor}" />
+                                    <Label
+                                        FontAttributes="Bold"
+                                        FontSize="12"
+                                        Text="{Binding AskedPrice, StringFormat='{0:C}'}"
+                                        TextColor="{DynamicResource AppPrimaryColor}" />
+                                </HorizontalStackLayout>
+
+                                <HorizontalStackLayout
+                                    Grid.Row="3"
+                                    Grid.Column="0"
+                                    Grid.ColumnSpan="3"
+                                    Margin="0,5,0,0"
+                                    Spacing="10">
+                                    <HorizontalStackLayout Spacing="5">
+                                        <Label
+                                            FontAttributes="Bold"
+                                            FontSize="11"
+                                            Text="Materials:"
+                                            TextColor="{DynamicResource AppSubtextColor}"
+                                            VerticalOptions="Center" />
+                                        <Frame
+                                            Padding="8,2"
+                                            BackgroundColor="{DynamicResource AppBorderColor}"
+                                            CornerRadius="12"
+                                            HasShadow="False">
+                                            <Label
+                                                FontSize="10"
+                                                Text="{Binding DisplayMaterials}"
+                                                TextColor="{DynamicResource AppTextColor}" />
+                                        </Frame>
+                                    </HorizontalStackLayout>
+
+                                    <HorizontalStackLayout Spacing="5">
+                                        <Label
+                                            FontAttributes="Bold"
+                                            FontSize="11"
+                                            Text="Processes:"
+                                            TextColor="{DynamicResource AppSubtextColor}"
+                                            VerticalOptions="Center" />
+                                        <Frame
+                                            Padding="8,2"
+                                            BackgroundColor="{DynamicResource AppBorderColor}"
+                                            CornerRadius="12"
+                                            HasShadow="False">
+                                            <Label
+                                                FontSize="10"
+                                                Text="{Binding DisplayMachiningProcesses}"
+                                                TextColor="{DynamicResource AppTextColor}" />
+                                        </Frame>
+                                    </HorizontalStackLayout>
+                                </HorizontalStackLayout>
+
+                                <!--  Modern Pill-Shaped Automation Badge  -->
+                                <Border
+                                    Grid.Row="4"
+                                    Grid.Column="0"
+                                    Margin="0,15,0,0"
+                                    Padding="12,4"
+                                    BackgroundColor="{Binding IsAutomationPossible, Converter={StaticResource BoolToColorConverter}}"
+                                    HorizontalOptions="Start"
+                                    StrokeShape="RoundRectangle 12"
+                                    StrokeThickness="0">
+                                    <Label
+                                        FontAttributes="Bold"
+                                        FontSize="11"
+                                        Text="{Binding IsAutomationPossible, Converter={StaticResource BoolToTextConverter}}"
+                                        TextColor="White"
+                                        VerticalOptions="Center" />
+                                </Border>
+
+                                <HorizontalStackLayout
+                                    Grid.Row="4"
+                                    Grid.Column="1"
+                                    Grid.ColumnSpan="2"
+                                    Margin="0,15,0,0"
+                                    HorizontalOptions="End"
+                                    Spacing="10">
+
+                                    <Button
+                                        Padding="10,6"
+                                        BackgroundColor="#fd7e14"
+                                        Command="{Binding Source={RelativeSource AncestorType={x:Type viewmodels:MainViewModel}}, Path=OpenLeadFolderCommand}"
+                                        CommandParameter="{Binding .}"
+                                        CornerRadius="8"
+                                        FontAttributes="Bold"
+                                        FontSize="11"
+                                        Text="Open Folder"
+                                        TextColor="{DynamicResource AppSurfaceColor}" />
+
+                                    <Button
+                                        Padding="10,6"
+                                        BackgroundColor="#28a745"
+                                        Command="{Binding Source={RelativeSource AncestorType={x:Type viewmodels:MainViewModel}}, Path=ViewHistoryCommand}"
+                                        CommandParameter="{Binding .}"
+                                        CornerRadius="8"
+                                        FontAttributes="Bold"
+                                        FontSize="11"
+                                        Text="📜 Log"
+                                        TextColor="{DynamicResource AppSurfaceColor}" />
+
+                                    <!--  Sleek CTA Button  -->
+                                    <Button
+                                        Padding="15,6"
+                                        BackgroundColor="{DynamicResource AppPrimaryColor}"
+                                        Command="{Binding Source={RelativeSource AncestorType={x:Type viewmodels:MainViewModel}}, Path=ViewJobCommand}"
+                                        CommandParameter="{Binding Url}"
+                                        CornerRadius="8"
+                                        FontAttributes="Bold"
+                                        FontSize="12"
+                                        Text="Lead Source"
+                                        TextColor="{DynamicResource AppSurfaceColor}" />
+                                </HorizontalStackLayout>
+
+                            </Grid>
+                        </Border>
+                    </DataTemplate>
+                </CollectionView.ItemTemplate>
+            </CollectionView>
+        </ContentView>
+
+    </Grid>
+</ContentPage>
