@@ -1,21 +1,16 @@
-using System.ComponentModel;
-using System.Runtime.CompilerServices;
-using System.Windows.Input;
+using CommunityToolkit.Mvvm.ComponentModel;
+using CommunityToolkit.Mvvm.Input;
 using Microsoft.Maui.Controls;
 
 namespace JobHunterDashboard.ViewModels;
 
-public class SettingsViewModel : INotifyPropertyChanged
+public partial class SettingsViewModel : ObservableObject
 {
-    public ICommand ChangeThemeModeCommand { get; }
-    public ICommand ChangeAccentColorCommand { get; }
-
     public SettingsViewModel()
     {
-        ChangeThemeModeCommand = new Command<string>(ApplyThemeMode);
-        ChangeAccentColorCommand = new Command<string>(ApplyAccentColor);
     }
 
+    [RelayCommand]
     private void ApplyThemeMode(string mode)
     {
         var resources = Application.Current?.Resources;
@@ -39,6 +34,7 @@ public class SettingsViewModel : INotifyPropertyChanged
         }
     }
 
+    [RelayCommand]
     private void ApplyAccentColor(string colorKey)
     {
         var resources = Application.Current?.Resources;
@@ -47,10 +43,5 @@ public class SettingsViewModel : INotifyPropertyChanged
             resources["AppPrimaryColor"] = newColor;
         }
     }
-
-    public event PropertyChangedEventHandler? PropertyChanged;
-    protected void OnPropertyChanged([CallerMemberName] string? propertyName = null)
-    {
-        PropertyChanged?.Invoke(this, new PropertyChangedEventArgs(propertyName));
-    }
 }
+

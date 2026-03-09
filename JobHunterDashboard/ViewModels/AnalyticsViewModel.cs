@@ -5,6 +5,8 @@ using System.Windows.Input;
 using JobHunterDashboard.Models;
 using JobHunter.Application.Interfaces;
 using JobHunter.Domain.Models;
+using CommunityToolkit.Mvvm.ComponentModel;
+using CommunityToolkit.Mvvm.Input;
 
 namespace JobHunterDashboard.ViewModels;
 
@@ -14,64 +16,45 @@ public class ChartDataPoint
     public double YValue { get; set; }
 }
 
-public class AnalyticsViewModel : INotifyPropertyChanged
+public partial class AnalyticsViewModel : ObservableObject
 {
     private readonly IAnalyticsService _analyticsService;
 
     // --- Tab selection ---
+    [ObservableProperty]
+    [NotifyPropertyChangedFor(nameof(IsStatisticsVisible))]
+    [NotifyPropertyChangedFor(nameof(IsRegressionVisible))]
+    [NotifyPropertyChangedFor(nameof(IsMLVisible))]
     private int _selectedTabIndex;
-    public int SelectedTabIndex
-    {
-        get => _selectedTabIndex;
-        set { _selectedTabIndex = value; OnPropertyChanged(); OnPropertyChanged(nameof(IsStatisticsVisible)); OnPropertyChanged(nameof(IsRegressionVisible)); OnPropertyChanged(nameof(IsMLVisible)); }
-    }
 
     public bool IsStatisticsVisible => SelectedTabIndex == 0;
     public bool IsRegressionVisible => SelectedTabIndex == 1;
     public bool IsMLVisible => SelectedTabIndex == 2;
 
     // --- Configuration panel ---
+    [ObservableProperty]
     private bool _isConfigOpen = true;
-    public bool IsConfigOpen
-    {
-        get => _isConfigOpen;
-        set { _isConfigOpen = value; OnPropertyChanged(); }
-    }
 
     // --- Table selection ---
     public ObservableCollection<string> Tables { get; } = new();
 
+    [ObservableProperty]
     private string? _selectedPrimaryTable;
-    public string? SelectedPrimaryTable
+
+    partial void OnSelectedPrimaryTableChanged(string? value)
     {
-        get => _selectedPrimaryTable;
-        set
-        {
-            if (_selectedPrimaryTable != value)
-            {
-                _selectedPrimaryTable = value;
-                OnPropertyChanged();
-                _ = LoadColumnsForPrimaryTableAsync();
-            }
-        }
+        _ = LoadColumnsForPrimaryTableAsync();
     }
 
     public ObservableCollection<string> PrimaryColumns { get; } = new();
 
+    [ObservableProperty]
+    [NotifyPropertyChangedFor(nameof(IsJoinConfigVisible))]
     private string? _selectedJoinTable;
-    public string? SelectedJoinTable
+
+    partial void OnSelectedJoinTableChanged(string? value)
     {
-        get => _selectedJoinTable;
-        set
-        {
-            if (_selectedJoinTable != value)
-            {
-                _selectedJoinTable = value;
-                OnPropertyChanged();
-                OnPropertyChanged(nameof(IsJoinConfigVisible));
-                _ = LoadColumnsForJoinTableAsync();
-            }
-        }
+        _ = LoadColumnsForJoinTableAsync();
     }
 
     public ObservableCollection<string> JoinColumns { get; } = new();
@@ -80,68 +63,36 @@ public class AnalyticsViewModel : INotifyPropertyChanged
     // --- Join config ---
     public ObservableCollection<string> JoinTypes { get; } = new() { "Inner", "Left", "Right", "Full" };
 
+    [ObservableProperty]
     private string _selectedJoinType = "Inner";
-    public string SelectedJoinType
-    {
-        get => _selectedJoinType;
-        set { _selectedJoinType = value; OnPropertyChanged(); }
-    }
 
+    [ObservableProperty]
     private string? _joinColumnLeft;
-    public string? JoinColumnLeft
-    {
-        get => _joinColumnLeft;
-        set { _joinColumnLeft = value; OnPropertyChanged(); }
-    }
 
+    [ObservableProperty]
     private string? _joinColumnRight;
-    public string? JoinColumnRight
-    {
-        get => _joinColumnRight;
-        set { _joinColumnRight = value; OnPropertyChanged(); }
-    }
 
     // --- Axis & Aggregate ---
     public ObservableCollection<string> AllAvailableColumns { get; } = new();
 
+    [ObservableProperty]
     private string? _selectedXAxis;
-    public string? SelectedXAxis
-    {
-        get => _selectedXAxis;
-        set { _selectedXAxis = value; OnPropertyChanged(); }
-    }
 
+    [ObservableProperty]
     private string? _selectedYAxis;
-    public string? SelectedYAxis
-    {
-        get => _selectedYAxis;
-        set { _selectedYAxis = value; OnPropertyChanged(); }
-    }
 
     public ObservableCollection<string> AggregateFunctions { get; } = new() { "None", "Count", "Sum", "Avg", "Min", "Max" };
 
+    [ObservableProperty]
     private string _selectedAggregate = "Count";
-    public string SelectedAggregate
-    {
-        get => _selectedAggregate;
-        set { _selectedAggregate = value; OnPropertyChanged(); }
-    }
 
     // --- Chart type ---
     public ObservableCollection<string> ChartTypes { get; } = new() { "Bar", "Column", "Line", "Pie", "Doughnut", "Scatter" };
 
+    [ObservableProperty]
+    [NotifyPropertyChangedFor(nameof(IsCartesianChart))]
+    [NotifyPropertyChangedFor(nameof(IsCircularChart))]
     private string _selectedChartType = "Column";
-    public string SelectedChartType
-    {
-        get => _selectedChartType;
-        set
-        {
-            _selectedChartType = value;
-            OnPropertyChanged();
-            OnPropertyChanged(nameof(IsCartesianChart));
-            OnPropertyChanged(nameof(IsCircularChart));
-        }
-    }
 
     public bool IsCartesianChart => SelectedChartType != "Pie" && SelectedChartType != "Doughnut";
     public bool IsCircularChart => SelectedChartType == "Pie" || SelectedChartType == "Doughnut";
@@ -149,49 +100,33 @@ public class AnalyticsViewModel : INotifyPropertyChanged
     // --- Chart data ---
     public ObservableCollection<ChartDataPoint> ChartData { get; } = new();
 
+    [ObservableProperty]
     private bool _isLoading;
-    public bool IsLoading
-    {
-        get => _isLoading;
-        set { _isLoading = value; OnPropertyChanged(); }
-    }
 
+    [ObservableProperty]
+    [NotifyPropertyChangedFor(nameof(HasError))]
     private string? _errorMessage;
-    public string? ErrorMessage
-    {
-        get => _errorMessage;
-        set { _errorMessage = value; OnPropertyChanged(); OnPropertyChanged(nameof(HasError)); }
-    }
 
     public bool HasError => !string.IsNullOrEmpty(ErrorMessage);
 
+    [ObservableProperty]
     private bool _hasData;
-    public bool HasData
-    {
-        get => _hasData;
-        set { _hasData = value; OnPropertyChanged(); }
-    }
-
-    // --- Commands ---
-    public ICommand SelectTabCommand { get; }
-    public ICommand ToggleConfigCommand { get; }
-    public ICommand RunQueryCommand { get; }
 
     public AnalyticsViewModel(IAnalyticsService analyticsService)
     {
         _analyticsService = analyticsService;
-
-        SelectTabCommand = new Command<string>(index =>
-        {
-            if (int.TryParse(index, out var i))
-                SelectedTabIndex = i;
-        });
-
-        ToggleConfigCommand = new Command(() => IsConfigOpen = !IsConfigOpen);
-        RunQueryCommand = new Command(async () => await ExecuteQueryAsync());
-
         _ = LoadTablesAsync();
     }
+
+    [RelayCommand]
+    private void SelectTab(string index)
+    {
+        if (int.TryParse(index, out var i))
+            SelectedTabIndex = i;
+    }
+
+    [RelayCommand]
+    private void ToggleConfig() => IsConfigOpen = !IsConfigOpen;
 
     private async Task LoadTablesAsync()
     {
@@ -277,6 +212,7 @@ public class AnalyticsViewModel : INotifyPropertyChanged
         return Task.CompletedTask;
     }
 
+    [RelayCommand]
     private async Task ExecuteQueryAsync()
     {
         ErrorMessage = null;
@@ -339,10 +275,5 @@ public class AnalyticsViewModel : INotifyPropertyChanged
             IsLoading = false;
         }
     }
-
-    public event PropertyChangedEventHandler? PropertyChanged;
-    protected void OnPropertyChanged([CallerMemberName] string? propertyName = null)
-    {
-        PropertyChanged?.Invoke(this, new PropertyChangedEventArgs(propertyName));
-    }
 }
+

@@ -7,10 +7,12 @@ using JobHunter.Domain.Models;
 using JobHunter.Domain.Interfaces;
 using JobHunter.Application.Interfaces;
 using JobHunterDashboard.Models;
+using CommunityToolkit.Mvvm.ComponentModel;
+using CommunityToolkit.Mvvm.Input;
 
 namespace JobHunterDashboard.ViewModels;
 
-public class MainViewModel : INotifyPropertyChanged
+public partial class MainViewModel : ObservableObject
 {
     private readonly IEmailService _emailService;
     private readonly IJobLeadRepository _repository;
@@ -18,90 +20,48 @@ public class MainViewModel : INotifyPropertyChanged
     private readonly IJobStatusRepository _statusRepository;
     private readonly IBusinessService _businessService;
 
+    [ObservableProperty]
     private ObservableCollection<DashboardJobOpportunity> _jobs = new();
-    public ObservableCollection<DashboardJobOpportunity> Jobs
-    {
-        get => _jobs;
-        set { _jobs = value; OnPropertyChanged(); }
-    }
 
     public ObservableCollection<FilterItem> ProviderFilters { get; } = new();
     public ObservableCollection<FilterItem> StatusFilters { get; } = new();
     public ObservableCollection<JobStatus> AvailableStatuses { get; } = new();
     public ObservableCollection<Business> AvailableBusinesses { get; } = new();
 
+    [ObservableProperty]
     private int _currentPage = 1;
     private const int PageSize = 20;
 
+    [ObservableProperty]
     private JobSortOption _selectedSortOption = JobSortOption.NewestFirst;
-    public JobSortOption SelectedSortOption
+
+    partial void OnSelectedSortOptionChanged(JobSortOption value)
     {
-        get => _selectedSortOption;
-        set
-        {
-            if (_selectedSortOption != value)
-            {
-                _selectedSortOption = value;
-                OnPropertyChanged();
-                _ = LoadLeadsFromDatabaseAsync();
-            }
-        }
+        _ = LoadLeadsFromDatabaseAsync();
     }
 
     public Array SortOptions => Enum.GetValues(typeof(JobSortOption));
 
+    [ObservableProperty]
+    [NotifyPropertyChangedFor(nameof(HasError))]
     private string? _errorMessage;
-    public string? ErrorMessage
-    {
-        get => _errorMessage;
-        set { _errorMessage = value; OnPropertyChanged(); OnPropertyChanged(nameof(HasError)); }
-    }
 
     public bool HasError => !string.IsNullOrEmpty(ErrorMessage);
 
+    [ObservableProperty]
     private bool _isProviderDropdownOpen;
-    public bool IsProviderDropdownOpen
-    {
-        get => _isProviderDropdownOpen;
-        set { _isProviderDropdownOpen = value; OnPropertyChanged(); }
-    }
 
+    [ObservableProperty]
     private bool _isStatusDropdownOpen;
-    public bool IsStatusDropdownOpen
-    {
-        get => _isStatusDropdownOpen;
-        set { _isStatusDropdownOpen = value; OnPropertyChanged(); }
-    }
 
+    [ObservableProperty]
     private string _searchText = "";
-    public string SearchText
+
+    partial void OnSearchTextChanged(string value)
     {
-        get => _searchText;
-        set
-        {
-            if (_searchText != value)
-            {
-                _searchText = value;
-                Preferences.Default.Set("SearchText", value);
-                OnPropertyChanged();
-                _ = LoadLeadsFromDatabaseAsync();
-            }
-        }
+        Preferences.Default.Set("SearchText", value);
+        _ = LoadLeadsFromDatabaseAsync();
     }
-
-    public ICommand ToggleProviderDropdownCommand { get; }
-    public ICommand ToggleStatusDropdownCommand { get; }
-
-    public ICommand ChangeStatusCommand { get; }
-    public ICommand ViewJobCommand { get; }
-    public ICommand FetchLeadsCommand { get; }
-    public ICommand LoadMoreCommand { get; }
-
-    // New Commands for PDF/Quote
-    public ICommand OpenLeadFolderCommand { get; }
-    public ICommand ImportQuoteCommand { get; }
-    public ICommand GenerateDummyQuoteCommand { get; }
-    public ICommand ViewHistoryCommand { get; }
 
     public MainViewModel(IEmailService emailService, IJobLeadRepository repository, ILeadWorkflowService workflowService, IJobStatusRepository statusRepository, IBusinessService businessService)
     {
@@ -115,38 +75,50 @@ public class MainViewModel : INotifyPropertyChanged
         _searchText = Preferences.Default.Get("SearchText", "");
 
         // Statuses and Providers will be loaded from DB in InitializeAsync
-
-        ToggleProviderDropdownCommand = new Command(() =>
-        {
-            IsProviderDropdownOpen = !IsProviderDropdownOpen;
-            if (IsProviderDropdownOpen) IsStatusDropdownOpen = false;
-        });
-
-        ToggleStatusDropdownCommand = new Command(() =>
-        {
-            IsStatusDropdownOpen = !IsStatusDropdownOpen;
-            if (IsStatusDropdownOpen) IsProviderDropdownOpen = false;
-        });
-
-        ViewJobCommand = new Command<string>(async (url) =>
-        {
-            if (!string.IsNullOrEmpty(url))
-                await Launcher.Default.OpenAsync(url);
-            else if (Application.Current?.MainPage != null)
-                await Application.Current.MainPage.DisplayAlert("Error", "No URL is available for this job lead.", "OK");
-        });
-
-        FetchLeadsCommand = new Command(async () => await FetchLeadsAsync());
-        LoadMoreCommand = new Command(async () => await LoadLeadsFromDatabaseAsync(true));
-
-        OpenLeadFolderCommand = new Command<DashboardJobOpportunity>(async (job) => await OpenLeadFolderAsync(job));
-        ImportQuoteCommand = new Command<DashboardJobOpportunity>(async (job) => await ImportQuoteAsync(job));
-        GenerateDummyQuoteCommand = new Command<DashboardJobOpportunity>(async (job) => await GenerateDummyQuoteAsync(job));
-        ViewHistoryCommand = new Command<DashboardJobOpportunity>(async (job) => await ViewHistoryAsync(job));
-
         // Load data from DB
         _ = InitializeAsync();
     }
+
+    [RelayCommand]
+    private void ToggleProviderDropdown()
+    {
+        IsProviderDropdownOpen = !IsProviderDropdownOpen;
+        if (IsProviderDropdownOpen) IsStatusDropdownOpen = false;
+    }
+
+    [RelayCommand]
+    private void ToggleStatusDropdown()
+    {
+        IsStatusDropdownOpen = !IsStatusDropdownOpen;
+        if (IsStatusDropdownOpen) IsProviderDropdownOpen = false;
+    }
+
+    [RelayCommand]
+    private async Task ViewJob(string? url)
+    {
+        if (!string.IsNullOrEmpty(url))
+            await Launcher.Default.OpenAsync(url);
+        else if (Application.Current?.MainPage != null)
+            await Application.Current.MainPage.DisplayAlert("Error", "No URL is available for this job lead.", "OK");
+    }
+
+    [RelayCommand]
+    private async Task FetchLeads() => await FetchLeadsAsync();
+
+    [RelayCommand]
+    private async Task LoadMore() => await LoadLeadsFromDatabaseAsync(true);
+
+    [RelayCommand]
+    private async Task OpenLeadFolder(DashboardJobOpportunity job) => await OpenLeadFolderAsync(job);
+
+    [RelayCommand]
+    private async Task ImportQuote(DashboardJobOpportunity job) => await ImportQuoteAsync(job);
+
+    [RelayCommand]
+    private async Task GenerateDummyQuote(DashboardJobOpportunity job) => await GenerateDummyQuoteAsync(job);
+
+    [RelayCommand]
+    private async Task ViewHistory(DashboardJobOpportunity job) => await ViewHistoryAsync(job);
 
     private async Task InitializeAsync()
     {
@@ -200,14 +172,14 @@ public class MainViewModel : INotifyPropertyChanged
         {
             if (!isLoadMore)
             {
-                _currentPage = 1;
+                CurrentPage = 1;
                 Jobs.Clear();
             }
 
             var pList = ProviderFilters.Where(x => x.IsSelected).Select(x => x.Name).ToList();
             var sList = StatusFilters.Where(x => x.IsSelected).Select(x => x.Name).ToList();
 
-            var domainLeads = await _repository.GetLeadsAsync(SearchText, pList, sList, _currentPage, PageSize, SelectedSortOption);
+            var domainLeads = await _repository.GetLeadsAsync(SearchText, pList, sList, CurrentPage, PageSize, SelectedSortOption);
 
             // Map Domain models to Presentation models (DashboardJobOpportunity)
             foreach (var lead in domainLeads)
@@ -244,7 +216,7 @@ public class MainViewModel : INotifyPropertyChanged
 
             if (domainLeads.Any())
             {
-                _currentPage++;
+                CurrentPage++;
             }
         }
         catch (Exception ex)
@@ -533,12 +505,5 @@ public class MainViewModel : INotifyPropertyChanged
 
             await Application.Current.MainPage.DisplayAlert($"Status History", historyStr, "Close");
         }
-    }
-
-    public event PropertyChangedEventHandler? PropertyChanged;
-
-    protected void OnPropertyChanged([CallerMemberName] string? propertyName = null)
-    {
-        PropertyChanged?.Invoke(this, new PropertyChangedEventArgs(propertyName));
     }
 }

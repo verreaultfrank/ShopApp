@@ -18,6 +18,8 @@ public partial class MainPage : ContentPage
 
         if (picker.BindingContext is DashboardJobOpportunity job)
         {
+            if (!picker.IsFocused) return; // Only react to user interaction!
+
             var newStatus = (JobStatus)picker.SelectedItem;
             if (newStatus?.Id == job.Status?.Id) return; // Prevent Initialization Spams
 
@@ -39,6 +41,8 @@ public partial class MainPage : ContentPage
 
         if (picker.BindingContext is DashboardJobOpportunity job && picker.SelectedItem is Business newBusiness)
         {
+            if (!picker.IsFocused) return; // Only react to user interaction!
+
             if (newBusiness.Id == job.BusinessId) return;
 
             var viewModel = (MainViewModel)BindingContext;
@@ -52,6 +56,8 @@ public partial class MainPage : ContentPage
 
         if (picker.BindingContext is DashboardJobOpportunity job && picker.SelectedItem is JobHunter.Domain.Models.Contact newContact)
         {
+            if (!picker.IsFocused) return; // Only react to user interaction!
+
             if (newContact.Id == job.PreferredContactId) return;
 
             var viewModel = (MainViewModel)BindingContext;

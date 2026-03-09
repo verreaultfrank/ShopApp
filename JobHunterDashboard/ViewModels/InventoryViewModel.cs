@@ -2,71 +2,47 @@ using System.Collections.ObjectModel;
 using System.ComponentModel;
 using System.Runtime.CompilerServices;
 using System.Windows.Input;
+using CommunityToolkit.Mvvm.ComponentModel;
+using CommunityToolkit.Mvvm.Input;
 using JobHunter.Application.Interfaces;
 using JobHunter.Domain.Models;
 using JobHunterDashboard.Models;
 
 namespace JobHunterDashboard.ViewModels;
 
-public class InventoryViewModel : INotifyPropertyChanged
+public partial class InventoryViewModel : ObservableObject
 {
     private readonly IStockItemService _service;
 
+    [ObservableProperty]
     private ObservableCollection<StockItem> _stockItems = new();
-    public ObservableCollection<StockItem> StockItems
-    {
-        get => _stockItems;
-        set { _stockItems = value; OnPropertyChanged(); }
-    }
 
+    [ObservableProperty]
     private ObservableCollection<StockType> _stockTypesList = new();
-    public ObservableCollection<StockType> StockTypesList
-    {
-        get => _stockTypesList;
-        set { _stockTypesList = value; OnPropertyChanged(); }
-    }
 
+    [ObservableProperty]
     private ObservableCollection<Material> _materials = new();
-    public ObservableCollection<Material> Materials
-    {
-        get => _materials;
-        set { _materials = value; OnPropertyChanged(); }
-    }
 
     // ── Filter collections ──
     public ObservableCollection<FilterItem> StockTypeFilters { get; } = new();
     public ObservableCollection<FilterItem> MaterialCategoryFilters { get; } = new();
 
     // ── Search ──
+    [ObservableProperty]
     private string _searchText = "";
-    public string SearchText
+
+    partial void OnSearchTextChanged(string value)
     {
-        get => _searchText;
-        set
-        {
-            if (_searchText != value)
-            {
-                _searchText = value;
-                OnPropertyChanged();
-                _ = LoadStockItemsAsync();
-            }
-        }
+        _ = LoadStockItemsAsync();
     }
 
     // ── Sort ──
+    [ObservableProperty]
     private string _selectedSort = "Default";
-    public string SelectedSort
+
+    partial void OnSelectedSortChanged(string value)
     {
-        get => _selectedSort;
-        set
-        {
-            if (_selectedSort != value)
-            {
-                _selectedSort = value;
-                OnPropertyChanged();
-                _ = LoadStockItemsAsync();
-            }
-        }
+        _ = LoadStockItemsAsync();
     }
 
     public List<string> SortOptions { get; } = new()
@@ -83,109 +59,75 @@ public class InventoryViewModel : INotifyPropertyChanged
     };
 
     // ── Dropdown visibility ──
+    [ObservableProperty]
     private bool _isTypeDropdownOpen;
-    public bool IsTypeDropdownOpen
-    {
-        get => _isTypeDropdownOpen;
-        set { _isTypeDropdownOpen = value; OnPropertyChanged(); }
-    }
 
+    [ObservableProperty]
     private bool _isMaterialDropdownOpen;
-    public bool IsMaterialDropdownOpen
-    {
-        get => _isMaterialDropdownOpen;
-        set { _isMaterialDropdownOpen = value; OnPropertyChanged(); }
-    }
 
     // ── Paging ──
     private int _currentPage = 1;
     private const int PageSize = 30;
 
     // ── Create / Edit form state ──
+    [ObservableProperty]
     private bool _isFormVisible;
-    public bool IsFormVisible
-    {
-        get => _isFormVisible;
-        set { _isFormVisible = value; OnPropertyChanged(); }
-    }
 
+    [ObservableProperty]
+    [NotifyPropertyChangedFor(nameof(FormTitle))]
     private bool _isEditing;
-    public bool IsEditing
-    {
-        get => _isEditing;
-        set { _isEditing = value; OnPropertyChanged(); OnPropertyChanged(nameof(FormTitle)); }
-    }
 
     public string FormTitle => IsEditing ? "Edit Stock Item" : "Add New Stock";
 
     private int _editingId;
 
+    [ObservableProperty]
     private StockType? _formStockType;
-    public StockType? FormStockType
-    {
-        get => _formStockType;
-        set { _formStockType = value; OnPropertyChanged(); }
-    }
 
+    [ObservableProperty]
     private Material? _formMaterial;
-    public Material? FormMaterial
-    {
-        get => _formMaterial;
-        set { _formMaterial = value; OnPropertyChanged(); }
-    }
 
+    [ObservableProperty]
     private string _formOD = "";
-    public string FormOD { get => _formOD; set { _formOD = value; OnPropertyChanged(); } }
 
+    [ObservableProperty]
     private string _formID = "";
-    public string FormID { get => _formID; set { _formID = value; OnPropertyChanged(); } }
 
+    [ObservableProperty]
     private string _formWall = "";
-    public string FormWall { get => _formWall; set { _formWall = value; OnPropertyChanged(); } }
 
+    [ObservableProperty]
     private string _formWidth = "";
-    public string FormWidth { get => _formWidth; set { _formWidth = value; OnPropertyChanged(); } }
 
+    [ObservableProperty]
     private string _formHeight = "";
-    public string FormHeight { get => _formHeight; set { _formHeight = value; OnPropertyChanged(); } }
 
+    [ObservableProperty]
     private string _formThickness = "";
-    public string FormThickness { get => _formThickness; set { _formThickness = value; OnPropertyChanged(); } }
 
+    [ObservableProperty]
     private string _formLength = "";
-    public string FormLength { get => _formLength; set { _formLength = value; OnPropertyChanged(); } }
 
+    [ObservableProperty]
     private string _formAcrossFlats = "";
-    public string FormAcrossFlats { get => _formAcrossFlats; set { _formAcrossFlats = value; OnPropertyChanged(); } }
 
+    [ObservableProperty]
     private string _formLegLength = "";
-    public string FormLegLength { get => _formLegLength; set { _formLegLength = value; OnPropertyChanged(); } }
 
+    [ObservableProperty]
     private string _formLegWidth = "";
-    public string FormLegWidth { get => _formLegWidth; set { _formLegWidth = value; OnPropertyChanged(); } }
 
+    [ObservableProperty]
     private string _formFlangeWidth = "";
-    public string FormFlangeWidth { get => _formFlangeWidth; set { _formFlangeWidth = value; OnPropertyChanged(); } }
 
+    [ObservableProperty]
     private string _formWebDepth = "";
-    public string FormWebDepth { get => _formWebDepth; set { _formWebDepth = value; OnPropertyChanged(); } }
 
+    [ObservableProperty]
     private string _formQuantity = "1";
-    public string FormQuantity { get => _formQuantity; set { _formQuantity = value; OnPropertyChanged(); } }
 
+    [ObservableProperty]
     private string _formLocation = "";
-    public string FormLocation { get => _formLocation; set { _formLocation = value; OnPropertyChanged(); } }
-
-    // ── Commands ──
-    public ICommand ToggleTypeDropdownCommand { get; }
-    public ICommand ToggleMaterialDropdownCommand { get; }
-    public ICommand LoadMoreCommand { get; }
-    public ICommand RefreshCommand { get; }
-    public ICommand ShowCreateFormCommand { get; }
-    public ICommand CancelFormCommand { get; }
-    public ICommand SaveFormCommand { get; }
-    public ICommand EditCommand { get; }
-    public ICommand DeleteCommand { get; }
 
     // ── Materials service (injected separately for the form picker) ──
     private readonly JobHunter.Domain.Interfaces.IMaterialRepository _materialRepo;
@@ -206,40 +148,52 @@ public class InventoryViewModel : INotifyPropertyChanged
             MaterialCategoryFilters.Add(item);
         }
 
-        ToggleTypeDropdownCommand = new Command(() =>
-        {
-            IsTypeDropdownOpen = !IsTypeDropdownOpen;
-            if (IsTypeDropdownOpen) IsMaterialDropdownOpen = false;
-        });
-
-        ToggleMaterialDropdownCommand = new Command(() =>
-        {
-            IsMaterialDropdownOpen = !IsMaterialDropdownOpen;
-            if (IsMaterialDropdownOpen) IsTypeDropdownOpen = false;
-        });
-
-        LoadMoreCommand = new Command(async () => await LoadStockItemsAsync(true));
-        RefreshCommand = new Command(async () => await LoadStockItemsAsync());
-
-        ShowCreateFormCommand = new Command(() =>
-        {
-            IsEditing = false;
-            _editingId = 0;
-            ClearForm();
-            IsFormVisible = true;
-        });
-
-        CancelFormCommand = new Command(() =>
-        {
-            IsFormVisible = false;
-        });
-
-        SaveFormCommand = new Command(async () => await SaveStockItemAsync());
-        EditCommand = new Command<StockItem>(async (item) => await EditStockItemAsync(item));
-        DeleteCommand = new Command<StockItem>(async (item) => await DeleteStockItemAsync(item));
-
         _ = InitializeAsync();
     }
+
+    [RelayCommand]
+    private void ToggleTypeDropdown()
+    {
+        IsTypeDropdownOpen = !IsTypeDropdownOpen;
+        if (IsTypeDropdownOpen) IsMaterialDropdownOpen = false;
+    }
+
+    [RelayCommand]
+    private void ToggleMaterialDropdown()
+    {
+        IsMaterialDropdownOpen = !IsMaterialDropdownOpen;
+        if (IsMaterialDropdownOpen) IsTypeDropdownOpen = false;
+    }
+
+    [RelayCommand]
+    private async Task LoadMoreAsync() => await LoadStockItemsAsync(true);
+
+    [RelayCommand]
+    private async Task RefreshAsync() => await LoadStockItemsAsync();
+
+    [RelayCommand]
+    private void ShowCreateForm()
+    {
+        IsEditing = false;
+        _editingId = 0;
+        ClearForm();
+        IsFormVisible = true;
+    }
+
+    [RelayCommand]
+    private void CancelForm()
+    {
+        IsFormVisible = false;
+    }
+
+    [RelayCommand]
+    private async Task SaveFormAsync() => await SaveStockItemAsync();
+
+    [RelayCommand]
+    private async Task EditAsync(StockItem item) => await EditStockItemAsync(item);
+
+    [RelayCommand]
+    private async Task DeleteAsync(StockItem item) => await DeleteStockItemAsync(item);
 
     private async Task InitializeAsync()
     {
@@ -272,15 +226,15 @@ public class InventoryViewModel : INotifyPropertyChanged
 
     private string? MapSortOption(string display) => display switch
     {
-        "Material A→Z"       => "MaterialAsc",
-        "Material Z→A"       => "MaterialDesc",
-        "Type A→Z"           => "TypeAsc",
-        "Type Z→A"           => "TypeDesc",
-        "Qty Low→High"       => "QuantityAsc",
-        "Qty High→Low"       => "QuantityDesc",
-        "Length Short→Long"  => "LengthAsc",
-        "Length Long→Short"  => "LengthDesc",
-        _                    => null
+        "Material A→Z" => "MaterialAsc",
+        "Material Z→A" => "MaterialDesc",
+        "Type A→Z" => "TypeAsc",
+        "Type Z→A" => "TypeDesc",
+        "Qty Low→High" => "QuantityAsc",
+        "Qty High→Low" => "QuantityDesc",
+        "Length Short→Long" => "LengthAsc",
+        "Length Long→Short" => "LengthDesc",
+        _ => null
     };
 
     private async Task LoadStockItemsAsync(bool isLoadMore = false)
@@ -447,12 +401,5 @@ public class InventoryViewModel : INotifyPropertyChanged
     {
         if (string.IsNullOrWhiteSpace(value)) return null;
         return decimal.TryParse(value, out var result) ? result : null;
-    }
-
-    public event PropertyChangedEventHandler? PropertyChanged;
-
-    protected void OnPropertyChanged([CallerMemberName] string? propertyName = null)
-    {
-        PropertyChanged?.Invoke(this, new PropertyChangedEventArgs(propertyName));
     }
 }

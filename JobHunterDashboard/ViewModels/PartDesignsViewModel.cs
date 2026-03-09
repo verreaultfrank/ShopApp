@@ -1,57 +1,43 @@
 using System.Collections.ObjectModel;
-using System.ComponentModel;
-using System.Runtime.CompilerServices;
-using System.Windows.Input;
+using CommunityToolkit.Mvvm.ComponentModel;
+using CommunityToolkit.Mvvm.Input;
 using JobHunter.Domain.Interfaces;
 using JobHunter.Domain.Models;
 
 namespace JobHunterDashboard.ViewModels;
 
-public class PartDesignsViewModel : INotifyPropertyChanged
+public partial class PartDesignsViewModel : ObservableObject
 {
     private readonly IPartDesignRepository _repository;
     
+    [ObservableProperty]
     private ObservableCollection<PartDesign> _parts = new();
-    public ObservableCollection<PartDesign> Parts
-    {
-        get => _parts;
-        set { _parts = value; OnPropertyChanged(); }
-    }
 
+    [ObservableProperty]
     private string _searchText = "";
-    public string SearchText
-    {
-        get => _searchText;
-        set
-        {
-            if (_searchText != value)
-            {
-                _searchText = value;
-                OnPropertyChanged();
-                _ = LoadPartsAsync();
-            }
-        }
-    }
 
-    public ICommand ViewCadCommand { get; }
+    partial void OnSearchTextChanged(string value)
+    {
+        _ = LoadPartsAsync();
+    }
 
     public PartDesignsViewModel(IPartDesignRepository repository)
     {
         _repository = repository;
-        
-        ViewCadCommand = new Command<string>(async (path) => 
-        {
-            if (!string.IsNullOrEmpty(path) && File.Exists(path))
-            {
-                await Launcher.Default.OpenAsync(new OpenFileRequest { File = new ReadOnlyFile(path) });
-            }
-            else if (Application.Current?.MainPage != null)
-            {
-                await Application.Current.MainPage.DisplayAlert("Error", "CAD file not found on disk.", "OK");
-            }
-        });
-
         _ = LoadPartsAsync();
+    }
+
+    [RelayCommand]
+    private async Task ViewCad(string path)
+    {
+        if (!string.IsNullOrEmpty(path) && File.Exists(path))
+        {
+            await Launcher.Default.OpenAsync(new OpenFileRequest { File = new ReadOnlyFile(path) });
+        }
+        else if (Application.Current?.MainPage != null)
+        {
+            await Application.Current.MainPage.DisplayAlert("Error", "CAD file not found on disk.", "OK");
+        }
     }
 
     private async Task LoadPartsAsync()
@@ -79,7 +65,4 @@ public class PartDesignsViewModel : INotifyPropertyChanged
             Console.WriteLine($"Error loading parts: {ex.Message}");
         }
     }
-
-    public event PropertyChangedEventHandler? PropertyChanged;
-    protected void OnPropertyChanged([CallerMemberName] string? name = null) => PropertyChanged?.Invoke(this, new PropertyChangedEventArgs(name));
 }
