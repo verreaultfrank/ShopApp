@@ -17,7 +17,7 @@ public abstract class BaseJobProvider : IJobProvider
     public abstract bool SupportsAutomation { get; }
     public abstract bool SupportsApiQuoting { get; }
 
-    public async Task<IEnumerable<JobOpportunity>> FetchJobsAsync(CancellationToken cancellationToken = default)
+    public async Task<IEnumerable<Lead>> FetchJobsAsync(CancellationToken cancellationToken = default)
     {
         _logger.LogInformation("Starting job fetch for provider: {ProviderName}", ProviderName);
         try
@@ -27,16 +27,16 @@ public abstract class BaseJobProvider : IJobProvider
         catch (Exception ex)
         {
             _logger.LogError(ex, "Error fetching jobs from {ProviderName}", ProviderName);
-            return Enumerable.Empty<JobOpportunity>();
+            return Enumerable.Empty<Lead>();
         }
     }
 
     /// <summary>
     /// Underlying abstract execution pattern to ensure error handling is wrapped globally.
     /// </summary>
-    protected abstract Task<IEnumerable<JobOpportunity>> ExecuteFetchAsync(CancellationToken cancellationToken);
+    protected abstract Task<IEnumerable<Lead>> ExecuteFetchAsync(CancellationToken cancellationToken);
 
-    public virtual Task<bool> SubmitQuoteAsync(JobOpportunity job, Quote quote)
+    public virtual Task<bool> SubmitQuoteAsync(Lead job, Quote quote)
     {
         if (!SupportsApiQuoting)
         {
@@ -47,7 +47,7 @@ public abstract class BaseJobProvider : IJobProvider
         return ExecuteSubmitQuoteAsync(job, quote);
     }
 
-    protected virtual Task<bool> ExecuteSubmitQuoteAsync(JobOpportunity job, Quote quote)
+    protected virtual Task<bool> ExecuteSubmitQuoteAsync(Lead job, Quote quote)
     {
         return Task.FromResult(false);
     }

@@ -211,7 +211,7 @@
                 RemainingItemsThreshold="5"
                 RemainingItemsThresholdReachedCommand="{Binding LoadMoreCommand}">
                 <CollectionView.ItemTemplate>
-                    <DataTemplate x:DataType="models:DashboardJobOpportunity">
+                    <DataTemplate x:DataType="models:DashboardLead">
 
                         <!--  Elevated Card  -->
                         <Border

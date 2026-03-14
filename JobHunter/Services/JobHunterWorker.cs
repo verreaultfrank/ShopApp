@@ -28,7 +28,7 @@ public class JobHunterWorker : BackgroundService
         {
             _logger.LogInformation("Starting scheduled job fetch at: {time}", DateTimeOffset.Now);
 
-            var allJobs = new List<JobOpportunity>();
+            var allJobs = new List<Lead>();
 
             // Iterate over all injected providers Polymorphically
             foreach (var provider in _providers)
@@ -46,7 +46,7 @@ public class JobHunterWorker : BackgroundService
         }
     }
 
-    private Task UpdateDashboardAsync(IEnumerable<JobOpportunity> jobs, CancellationToken stoppingToken)
+    private Task UpdateDashboardAsync(IEnumerable<Lead> jobs, CancellationToken stoppingToken)
     {
         // This is where you would push the aggregated 'jobs' array to a Database (Entity Framework),
         // a Redis Cache, or directly trigger the next layer of your AI, the 'Submissionner' Agent.

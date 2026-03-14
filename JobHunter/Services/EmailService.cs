@@ -5,7 +5,7 @@ namespace JobHunterCore.Services;
 
 public interface IEmailService
 {
-    Task SendQuoteEmailAsync(JobOpportunity job, Quote quote);
+    Task SendQuoteEmailAsync(Lead job, Quote quote);
 }
 
 public class EmailService : IEmailService
@@ -17,7 +17,7 @@ public class EmailService : IEmailService
         _logger = logger;
     }
 
-    public Task SendQuoteEmailAsync(JobOpportunity job, Quote quote)
+    public Task SendQuoteEmailAsync(Lead job, Quote quote)
     {
         // Mock implementation of sending an email
         _logger.LogInformation("===========================================");

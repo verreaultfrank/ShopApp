@@ -29,9 +29,9 @@ public partial class MainPage : ContentPage
         // 1. MAUI recycling/scrolling sets this to null. Ignore it!
         if (picker.SelectedItem == null) return;
 
-        if (picker.BindingContext is DashboardJobOpportunity job)
+        if (picker.BindingContext is DashboardLead job)
         {
-            var newStatus = (JobStatus)picker.SelectedItem;
+            var newStatus = (LeadStatus)picker.SelectedItem;
 
             // 2. The binding engine applying the initial value. Ignore it!
             if (newStatus.Id == job.Status?.Id) return;
@@ -54,7 +54,7 @@ public partial class MainPage : ContentPage
         // 1. Block scroll recycling
         if (picker.SelectedItem == null) return;
 
-        if (picker.BindingContext is DashboardJobOpportunity job && picker.SelectedItem is Business newBusiness)
+        if (picker.BindingContext is DashboardLead job && picker.SelectedItem is Business newBusiness)
         {
             // 2. Block initial binding
             if (newBusiness.Id == job.BusinessId) return;
@@ -72,7 +72,7 @@ public partial class MainPage : ContentPage
         // 1. Block scroll recycling
         if (picker.SelectedItem == null) return;
 
-        if (picker.BindingContext is DashboardJobOpportunity job && picker.SelectedItem is JobHunter.Domain.Models.Contact newContact)
+        if (picker.BindingContext is DashboardLead job && picker.SelectedItem is JobHunter.Domain.Models.Contact newContact)
         {
             // 2. Block initial binding
             if (newContact.Id == job.PreferredContactId) return;

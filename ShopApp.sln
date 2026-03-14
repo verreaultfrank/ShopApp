@@ -1,0 +1,59 @@
+Microsoft Visual Studio Solution File, Format Version 12.00
+# Visual Studio Version 18
+VisualStudioVersion = 18.4.11605.240
+MinimumVisualStudioVersion = 10.0.40219.1
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "JobHunter", "JobHunter", "{4860392B-13CE-0B9D-038E-C21AEAF3229C}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "JobHunter.Application", "JobHunter.Application\JobHunter.Application.csproj", "{636217CA-F7EB-DDB2-D62F-B8E52EB44E0A}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "JobHunter.Domain", "JobHunter.Domain\JobHunter.Domain.csproj", "{78BEB436-4482-D17E-4C74-5D5095577A44}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "JobHunter.Infrastructure", "JobHunter.Infrastructure\JobHunter.Infrastructure.csproj", "{47D4DA15-2F3F-5C5C-178E-DE9E0492277F}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "JobHunterDashboard", "JobHunterDashboard\JobHunterDashboard.csproj", "{B2453E49-CBA4-F2C8-573B-845AF7837004}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "JobHunterCore", "JobHunter\JobHunterCore.csproj", "{7CD008DA-EF4B-826F-8BB9-81D8E7BBDB8F}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "ShopHost", "ShopHost\ShopHost.csproj", "{8CBE8E59-B530-434A-ABFD-100DA8789FB5}"
+EndProject
+Global
+	GlobalSection(SolutionConfigurationPlatforms) = preSolution
+		Debug|Any CPU = Debug|Any CPU
+		Release|Any CPU = Release|Any CPU
+	EndGlobalSection
+	GlobalSection(ProjectConfigurationPlatforms) = postSolution
+		{636217CA-F7EB-DDB2-D62F-B8E52EB44E0A}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{636217CA-F7EB-DDB2-D62F-B8E52EB44E0A}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{636217CA-F7EB-DDB2-D62F-B8E52EB44E0A}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{636217CA-F7EB-DDB2-D62F-B8E52EB44E0A}.Release|Any CPU.Build.0 = Release|Any CPU
+		{78BEB436-4482-D17E-4C74-5D5095577A44}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{78BEB436-4482-D17E-4C74-5D5095577A44}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{78BEB436-4482-D17E-4C74-5D5095577A44}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{78BEB436-4482-D17E-4C74-5D5095577A44}.Release|Any CPU.Build.0 = Release|Any CPU
+		{47D4DA15-2F3F-5C5C-178E-DE9E0492277F}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{47D4DA15-2F3F-5C5C-178E-DE9E0492277F}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{47D4DA15-2F3F-5C5C-178E-DE9E0492277F}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{47D4DA15-2F3F-5C5C-178E-DE9E0492277F}.Release|Any CPU.Build.0 = Release|Any CPU
+		{B2453E49-CBA4-F2C8-573B-845AF7837004}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{B2453E49-CBA4-F2C8-573B-845AF7837004}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{B2453E49-CBA4-F2C8-573B-845AF7837004}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{B2453E49-CBA4-F2C8-573B-845AF7837004}.Release|Any CPU.Build.0 = Release|Any CPU
+		{7CD008DA-EF4B-826F-8BB9-81D8E7BBDB8F}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{7CD008DA-EF4B-826F-8BB9-81D8E7BBDB8F}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{7CD008DA-EF4B-826F-8BB9-81D8E7BBDB8F}.Release|Any CPU.Build.0 = Release|Any CPU
+		{8CBE8E59-B530-434A-ABFD-100DA8789FB5}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{8CBE8E59-B530-434A-ABFD-100DA8789FB5}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{8CBE8E59-B530-434A-ABFD-100DA8789FB5}.Debug|Any CPU.Deploy.0 = Debug|Any CPU
+		{8CBE8E59-B530-434A-ABFD-100DA8789FB5}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{8CBE8E59-B530-434A-ABFD-100DA8789FB5}.Release|Any CPU.Build.0 = Release|Any CPU
+	EndGlobalSection
+	GlobalSection(SolutionProperties) = preSolution
+		HideSolutionNode = FALSE
+	EndGlobalSection
+	GlobalSection(NestedProjects) = preSolution
+		{7CD008DA-EF4B-826F-8BB9-81D8E7BBDB8F} = {4860392B-13CE-0B9D-038E-C21AEAF3229C}
+	EndGlobalSection
+	GlobalSection(ExtensibilityGlobals) = postSolution
+		SolutionGuid = {79AA5650-A1A8-4B3C-A044-FC28A9523D1E}
+	EndGlobalSection
+EndGlobal

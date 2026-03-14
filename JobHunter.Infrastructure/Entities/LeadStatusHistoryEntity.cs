@@ -10,13 +10,13 @@ public class LeadStatusHistoryEntity
     [Key]
     public int Id { get; set; }
     
-    [Column("JobLeadId")]
-    public string JobLeadId { get; set; } = string.Empty;
-    public JobOpportunityEntity Job { get; set; } = null!;
+    [Column("LeadId")]
+    public string LeadId { get; set; } = string.Empty;
+    public LeadEntity Lead { get; set; } = null!;
 
-    [Column("JobStatusId")]
-    public int JobStatusId { get; set; }
-    public JobStatusEntity Status { get; set; } = null!;
+    [Column("LeadStatusId")]
+    public int LeadStatusId { get; set; }
+    public LeadStatusEntity Status { get; set; } = null!;
     public DateTime Date { get; set; }
     public string? Reason { get; set; }
 }

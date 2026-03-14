@@ -30,9 +30,9 @@ public class CanadaBuysProvider : RestApiJobProvider
         return request;
     }
 
-    protected override async Task<IEnumerable<JobOpportunity>> ParseResponseAsync(HttpResponseMessage response, CancellationToken cancellationToken)
+    protected override async Task<IEnumerable<Lead>> ParseResponseAsync(HttpResponseMessage response, CancellationToken cancellationToken)
     {
-        var opportunities = new List<JobOpportunity>();
+        var opportunities = new List<Lead>();
         
         try 
         {
@@ -49,7 +49,7 @@ public class CanadaBuysProvider : RestApiJobProvider
                     
                     if (title != null && title.Contains("manufacturing", StringComparison.OrdinalIgnoreCase))
                     {
-                        var opp = new JobOpportunity
+                        var opp = new Lead
                         {
                             Id = GetStringValue(record, "id") ?? Guid.NewGuid().ToString(),
                             Title = title,
@@ -79,14 +79,14 @@ public class CanadaBuysProvider : RestApiJobProvider
         // Always fallback to standard testing mock if nothing is found (API structure changed or no keywords matched)
         if(opportunities.Count == 0) 
         {
-            opportunities.Add(new JobOpportunity 
+            opportunities.Add(new Lead 
             {
                 Id = "CB-TEST-1002",
                 Title = "[MOCK] Precision CNC Machining for DND",
                 ClosingDate = DateTime.Now.AddDays(7),
                 IsAutomationPossible = true
             });
-            opportunities.Add(new JobOpportunity 
+            opportunities.Add(new Lead 
             {
                 Id = "CB-TEST-1003",
                 Title = "[MOCK] Automated Part Supply - 5000 units",

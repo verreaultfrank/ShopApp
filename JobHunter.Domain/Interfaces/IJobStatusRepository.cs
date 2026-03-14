@@ -4,5 +4,5 @@ namespace JobHunter.Domain.Interfaces;
 
 public interface IJobStatusRepository
 {
-    Task<IEnumerable<JobStatus>> GetAllStatusesAsync();
+    Task<IEnumerable<LeadStatus>> GetAllStatusesAsync();
 }

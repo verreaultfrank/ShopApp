@@ -15,7 +15,4 @@ public class MaterialEntity
     public string? IsoDesignation { get; set; }
     public string? Form { get; set; }
     public string? TemperCondition { get; set; }
-
-    // Navigation
-    public List<JobMaterialLinkEntity> JobLinks { get; set; } = new();
 }

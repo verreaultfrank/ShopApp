@@ -23,13 +23,13 @@ public class SeaoProvider : RestApiJobProvider
         return new HttpRequestMessage(HttpMethod.Get, "https://www.donneesquebec.ca/recherche/api/3/action/package_show?id=seao");
     }
 
-    protected override async Task<IEnumerable<JobOpportunity>> ParseResponseAsync(HttpResponseMessage response, CancellationToken cancellationToken)
+    protected override async Task<IEnumerable<Lead>> ParseResponseAsync(HttpResponseMessage response, CancellationToken cancellationToken)
     {
         _logger.LogInformation("Parsing SEAO data dump.");
-        var opportunities = new List<JobOpportunity>();
+        var opportunities = new List<Lead>();
         
         // Mock parsing
-        opportunities.Add(new JobOpportunity 
+        opportunities.Add(new Lead 
         {
             Id = "SEAO-9990",
             Title = "Usinage de pièces d'aluminium - Ministère de Transports",

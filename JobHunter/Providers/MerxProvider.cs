@@ -25,9 +25,9 @@ public class MerxProvider : RestApiJobProvider
         return request;
     }
 
-    protected override async Task<IEnumerable<JobOpportunity>> ParseResponseAsync(HttpResponseMessage response, CancellationToken cancellationToken)
+    protected override async Task<IEnumerable<Lead>> ParseResponseAsync(HttpResponseMessage response, CancellationToken cancellationToken)
     {
-        var opportunities = new List<JobOpportunity>();
+        var opportunities = new List<Lead>();
         _logger.LogInformation("Parsing MERX solicitation response.");
         return opportunities;
     }

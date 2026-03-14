@@ -4,9 +4,9 @@ namespace JobHunter.Domain.Interfaces;
 
 public interface IJobOpportunityRepository
 {
-    Task<JobOpportunity?> GetByIdAsync(string id);
-    Task<IEnumerable<JobOpportunity>> GetAllAsync();
-    Task AddAsync(JobOpportunity job);
-    Task UpdateAsync(JobOpportunity job);
+    Task<Lead?> GetByIdAsync(string id);
+    Task<IEnumerable<Lead>> GetAllAsync();
+    Task AddAsync(Lead job);
+    Task UpdateAsync(Lead job);
     Task DeleteAsync(string id);
 }

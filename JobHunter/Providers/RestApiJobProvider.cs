@@ -18,7 +18,7 @@ public abstract class RestApiJobProvider : BaseJobProvider
 
     public override bool SupportsAutomation => true;
 
-    protected override async Task<IEnumerable<JobOpportunity>> ExecuteFetchAsync(CancellationToken cancellationToken)
+    protected override async Task<IEnumerable<Lead>> ExecuteFetchAsync(CancellationToken cancellationToken)
     {
         var request = BuildRequest();
         var response = await _httpClient.SendAsync(request, cancellationToken);
@@ -28,5 +28,5 @@ public abstract class RestApiJobProvider : BaseJobProvider
     }
 
     protected abstract HttpRequestMessage BuildRequest();
-    protected abstract Task<IEnumerable<JobOpportunity>> ParseResponseAsync(HttpResponseMessage response, CancellationToken cancellationToken);
+    protected abstract Task<IEnumerable<Lead>> ParseResponseAsync(HttpResponseMessage response, CancellationToken cancellationToken);
 }

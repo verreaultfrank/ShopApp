@@ -50,7 +50,7 @@ public class LeadWorkflowService : ILeadWorkflowService
         }
     }
 
-    public async Task<bool> ValidateStateTransitionAsync(JobOpportunity lead, JobStatus newStatus)
+    public async Task<bool> ValidateStateTransitionAsync(Lead lead, LeadStatus newStatus)
     {
         // Compute current status from StatusHistories (same logic as DashboardJobOpportunity.Status)
         var currentStatus = lead.StatusHistories?.OrderByDescending(x => x.Date).FirstOrDefault()?.Status;
@@ -59,31 +59,28 @@ public class LeadWorkflowService : ILeadWorkflowService
 
         switch (currentStatus?.Name)
         {
-            case JobStatus.New:
+            case LeadStatus.New:
                 // A lead can only go from new status, to Quoted or Lost or Rejected
-                return newStatus?.Name is JobStatus.Quoted or JobStatus.Lost or JobStatus.Rejected;
+                return newStatus?.Name is LeadStatus.Quoted or LeadStatus.Lost or LeadStatus.Rejected;
                 
-            case JobStatus.Quoted:
+            case LeadStatus.Quoted:
                 // A lead can only go from Quoted to won or lost or rejected
-                if (newStatus?.Name is not (JobStatus.Won or JobStatus.Lost or JobStatus.Rejected)) return false;
+                if (newStatus?.Name is not (LeadStatus.Won or LeadStatus.Lost or LeadStatus.Rejected)) return false;
                 break;
                 
-            case JobStatus.Won:
+            case LeadStatus.Won:
                 // A lead can go from Won to Lost or Reject
-                return newStatus?.Name is JobStatus.Lost or JobStatus.Rejected;
+                return newStatus?.Name is LeadStatus.Lost or LeadStatus.Rejected;
                 
-            case JobStatus.Lost:
-            case JobStatus.Rejected:
+            case LeadStatus.Lost:
+            case LeadStatus.Rejected:
                 // No other lead status transition are possible!
                 return false;
         }
 
         // Additional validation when transitioning TO Quoted
-        if (newStatus?.Name == JobStatus.Quoted)
+        if (newStatus?.Name == LeadStatus.Quoted)
         {
-            if (lead.PartDesigns == null || !lead.PartDesigns.Any())
-                return false;
-
             var folderPath = await GetLeadFolderPathAsync(lead.Id);
             var quoteFiles = Directory.GetFiles(folderPath, "*quote*.pdf", SearchOption.TopDirectoryOnly);
             if (!quoteFiles.Any())
@@ -97,7 +94,7 @@ public class LeadWorkflowService : ILeadWorkflowService
         return true;
     }
 
-    public async Task ChangeLeadStatusAsync(JobOpportunity lead, JobStatus newStatus, string? reason = null)
+    public async Task ChangeLeadStatusAsync(Lead lead, LeadStatus newStatus, string? reason = null)
     {
         // Compute current status from StatusHistories
         var currentStatus = lead.StatusHistories?.OrderByDescending(x => x.Date).FirstOrDefault()?.Status;
@@ -110,7 +107,7 @@ public class LeadWorkflowService : ILeadWorkflowService
             throw new InvalidOperationException($"Cannot transition from {currentStatus?.Name} to {newStatus?.Name}. Requirements not met.");
         }
 
-        if ((newStatus?.Name == JobStatus.Lost || newStatus?.Name == JobStatus.Rejected) && string.IsNullOrWhiteSpace(reason))
+        if ((newStatus?.Name == LeadStatus.Lost || newStatus?.Name == LeadStatus.Rejected) && string.IsNullOrWhiteSpace(reason))
         {
             throw new ArgumentException("A reason is required when marking a lead as Lost or Rejected.", nameof(reason));
         }
@@ -119,7 +116,7 @@ public class LeadWorkflowService : ILeadWorkflowService
         lead.StatusHistories ??= new List<LeadStatusHistory>();
         lead.StatusHistories.Add(new LeadStatusHistory
         {
-            Status = new JobStatus { Id = newStatus!.Id, Name = newStatus.Name },
+            Status = new LeadStatus { Id = newStatus!.Id, Name = newStatus.Name },
             Date = DateTime.Now,
             Reason = reason
         });

@@ -12,15 +12,13 @@ public class JobHunterDbContext : DbContext
     {
     }
 
-    public DbSet<JobOpportunityEntity> JobLeads { get; set; }
+    public DbSet<LeadEntity> Leads { get; set; }
     public DbSet<MaterialEntity> Materials { get; set; }
-    public DbSet<JobMaterialLinkEntity> JobMaterialLinks { get; set; }
     public DbSet<StockTypeEntity> StockTypes { get; set; }
     public DbSet<StockItemEntity> StockItems { get; set; }
     public DbSet<PartDesignEntity> PartDesigns { get; set; }
-    public DbSet<JobPartDesignLinkEntity> JobPartDesignLinks { get; set; }
     public DbSet<LeadStatusHistoryEntity> LeadStatusHistories { get; set; }
-    public DbSet<JobStatusEntity> JobStatuses { get; set; }
+    public DbSet<LeadStatusEntity> JobStatuses { get; set; }
     public DbSet<BusinessEntity> Businesses { get; set; }
     public DbSet<ContactEntity> Contacts { get; set; }
 
@@ -29,23 +27,13 @@ public class JobHunterDbContext : DbContext
         base.OnModelCreating(modelBuilder);
 
         // ─── JobOpportunity ───
-        modelBuilder.Entity<JobOpportunityEntity>(entity =>
+        modelBuilder.Entity<LeadEntity>(entity =>
         {
             entity.HasKey(e => e.Id);
 
-            entity.HasMany(e => e.MaterialLinks)
-                  .WithOne(l => l.Job)
-                  .HasForeignKey(l => l.JobId)
-                  .OnDelete(DeleteBehavior.Cascade);
-
-            entity.HasMany(e => e.PartDesignLinks)
-                  .WithOne(l => l.Job)
-                  .HasForeignKey(l => l.JobLeadId)
-                  .OnDelete(DeleteBehavior.Cascade);
-
             entity.HasMany(e => e.StatusHistories)
-                  .WithOne(h => h.Job)
-                  .HasForeignKey(h => h.JobLeadId)
+                  .WithOne(h => h.Lead)
+                  .HasForeignKey(h => h.LeadId)
                   .OnDelete(DeleteBehavior.Cascade);
 
             entity.HasOne(e => e.Business)
@@ -76,24 +64,6 @@ public class JobHunterDbContext : DbContext
             entity.HasKey(e => e.Id);
         });
 
-        // ─── PartDesign ───
-        modelBuilder.Entity<PartDesignEntity>(entity =>
-        {
-            entity.HasKey(e => e.Id);
-
-            entity.HasMany(e => e.JobLinks)
-                  .WithOne(l => l.PartDesign)
-                  .HasForeignKey(l => l.PartDesignId)
-                  .OnDelete(DeleteBehavior.Cascade);
-        });
-
-        // ─── JobPartDesignLink ───
-        modelBuilder.Entity<JobPartDesignLinkEntity>(entity =>
-        {
-            entity.HasKey(e => e.Id);
-            entity.HasIndex(e => new { e.JobLeadId, e.PartDesignId }).IsUnique();
-        });
-
         // ─── LeadStatusHistory ───
         modelBuilder.Entity<LeadStatusHistoryEntity>(entity =>
         {
@@ -101,33 +71,15 @@ public class JobHunterDbContext : DbContext
 
             entity.HasOne(e => e.Status)
                   .WithMany()
-                  .HasForeignKey(e => e.JobStatusId)
+                  .HasForeignKey(e => e.LeadStatusId)
                   .OnDelete(DeleteBehavior.Restrict);
         });
 
         // ─── JobStatuses ───
-        modelBuilder.Entity<JobStatusEntity>(entity =>
+        modelBuilder.Entity<LeadStatusEntity>(entity =>
         {
             entity.HasKey(e => e.Id);
             entity.HasIndex(e => e.Name).IsUnique();
-        });
-
-        // ─── Material ───
-        modelBuilder.Entity<MaterialEntity>(entity =>
-        {
-            entity.HasKey(e => e.Id);
-
-            entity.HasMany(e => e.JobLinks)
-                  .WithOne(l => l.Material)
-                  .HasForeignKey(l => l.MaterialId)
-                  .OnDelete(DeleteBehavior.Cascade);
-        });
-
-        // ─── JobMaterialLink ───
-        modelBuilder.Entity<JobMaterialLinkEntity>(entity =>
-        {
-            entity.HasKey(e => e.Id);
-            entity.HasIndex(e => new { e.JobId, e.MaterialId }).IsUnique();
         });
 
         // ─── StockItem ───

@@ -15,12 +15,6 @@
                 ContentTemplate="{DataTemplate views:MainPage}"
                 Route="MainPage" />
         </Tab>
-        <Tab Title="Analytics">
-            <ShellContent
-                Title="Analytics"
-                ContentTemplate="{DataTemplate views:AnalyticsPage}"
-                Route="AnalyticsPage" />
-        </Tab>
         <Tab Title="Parts">
             <ShellContent
                 Title="Parts"

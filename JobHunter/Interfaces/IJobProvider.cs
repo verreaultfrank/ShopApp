@@ -12,7 +12,7 @@ public interface IJobProvider
     /// </summary>
     bool SupportsAutomation { get; }
 
-    Task<IEnumerable<JobOpportunity>> FetchJobsAsync(CancellationToken cancellationToken = default);
+    Task<IEnumerable<Lead>> FetchJobsAsync(CancellationToken cancellationToken = default);
 
     /// <summary>
     /// Indicates if this provider supports automated quoting via API.
@@ -22,5 +22,5 @@ public interface IJobProvider
     /// <summary>
     /// Submits a quote to the provider via API.
     /// </summary>
-    Task<bool> SubmitQuoteAsync(JobOpportunity job, Quote quote);
+    Task<bool> SubmitQuoteAsync(Lead job, Quote quote);
 }

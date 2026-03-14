@@ -10,6 +10,4 @@ public class PartDesignEntity
     public int Id { get; set; }
     public string Name { get; set; } = string.Empty;
     public string CadFilePath { get; set; } = string.Empty;
-    
-    public List<JobPartDesignLinkEntity> JobLinks { get; set; } = new();
 }

@@ -24,14 +24,14 @@ public class XometryProvider : RestApiJobProvider
         return request;
     }
 
-    protected override async Task<IEnumerable<JobOpportunity>> ParseResponseAsync(HttpResponseMessage response, CancellationToken cancellationToken)
+    protected override async Task<IEnumerable<Lead>> ParseResponseAsync(HttpResponseMessage response, CancellationToken cancellationToken)
     {
-        var opportunities = new List<JobOpportunity>();
+        var opportunities = new List<Lead>();
         _logger.LogInformation("Parsing Xometry jobs.");
         return opportunities;
     }
 
-    protected override Task<bool> ExecuteSubmitQuoteAsync(JobOpportunity job, Quote quote)
+    protected override Task<bool> ExecuteSubmitQuoteAsync(Lead job, Quote quote)
     {
         _logger.LogInformation("===========================================");
         _logger.LogInformation("MOCK API QUOTE SUBMISSION: XOMETRY");

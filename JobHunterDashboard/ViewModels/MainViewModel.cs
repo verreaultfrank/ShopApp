@@ -9,6 +9,7 @@ using JobHunter.Application.Interfaces;
 using JobHunterDashboard.Models;
 using CommunityToolkit.Mvvm.ComponentModel;
 using CommunityToolkit.Mvvm.Input;
+using JobHunter.Infrastructure.Services;
 
 namespace JobHunterDashboard.ViewModels;
 
@@ -21,11 +22,11 @@ public partial class MainViewModel : ObservableObject
     private readonly IBusinessService _businessService;
 
     [ObservableProperty]
-    private ObservableCollection<DashboardJobOpportunity> _jobs = new();
+    private ObservableCollection<DashboardLead> _jobs = new();
 
     public ObservableCollection<FilterItem> ProviderFilters { get; } = new();
     public ObservableCollection<FilterItem> StatusFilters { get; } = new();
-    public ObservableCollection<JobStatus> AvailableStatuses { get; } = new();
+    public ObservableCollection<LeadStatus> AvailableStatuses { get; } = new();
     public ObservableCollection<Business> AvailableBusinesses { get; } = new();
 
     [ObservableProperty]
@@ -33,14 +34,14 @@ public partial class MainViewModel : ObservableObject
     private const int PageSize = 20;
 
     [ObservableProperty]
-    private JobSortOption _selectedSortOption = JobSortOption.NewestFirst;
+    private LeadSortOption _selectedSortOption = LeadSortOption.NewestFirst;
 
-    partial void OnSelectedSortOptionChanged(JobSortOption value)
+    partial void OnSelectedSortOptionChanged(LeadSortOption value)
     {
         _ = LoadLeadsFromDatabaseAsync();
     }
 
-    public Array SortOptions => Enum.GetValues(typeof(JobSortOption));
+    public Array SortOptions => Enum.GetValues(typeof(LeadSortOption));
 
     [ObservableProperty]
     [NotifyPropertyChangedFor(nameof(HasError))]
@@ -107,16 +108,16 @@ public partial class MainViewModel : ObservableObject
     private async Task LoadMore() => await LoadLeadsFromDatabaseAsync(true);
 
     [RelayCommand]
-    private async Task OpenLeadFolder(DashboardJobOpportunity job) => await OpenLeadFolderAsync(job);
+    private async Task OpenLeadFolder(DashboardLead job) => await OpenLeadFolderAsync(job);
 
     [RelayCommand]
-    private async Task ImportQuote(DashboardJobOpportunity job) => await ImportQuoteAsync(job);
+    private async Task ImportQuote(DashboardLead job) => await ImportQuoteAsync(job);
 
     [RelayCommand]
-    private async Task GenerateDummyQuote(DashboardJobOpportunity job) => await GenerateDummyQuoteAsync(job);
+    private async Task GenerateDummyQuote(DashboardLead job) => await GenerateDummyQuoteAsync(job);
 
     [RelayCommand]
-    private async Task ViewHistory(DashboardJobOpportunity job) => await ViewHistoryAsync(job);
+    private async Task ViewHistory(DashboardLead job) => await ViewHistoryAsync(job);
 
     public async Task InitializeAsync()
     {
@@ -228,9 +229,9 @@ public partial class MainViewModel : ObservableObject
     /// Maps a Domain JobOpportunity to a Presentation DashboardJobOpportunity.
     /// This mapping is the Presentation layer's responsibility.
     /// </summary>
-    private static DashboardJobOpportunity MapToDashboard(JobOpportunity source)
+    private static DashboardLead MapToDashboard(Lead source)
     {
-        return new DashboardJobOpportunity
+        return new DashboardLead
         {
             Id = source.Id,
             Title = source.Title,
@@ -249,13 +250,11 @@ public partial class MainViewModel : ObservableObject
             Business = source.Business,
             PreferredContactId = source.PreferredContactId,
             PreferredContact = source.PreferredContact,
-            Materials = source.Materials,
-            PartDesigns = source.PartDesigns,
             StatusHistories = source.StatusHistories
         };
     }
 
-    public async Task ChangeBusinessAsync(DashboardJobOpportunity job, Business? newBusiness)
+    public async Task ChangeBusinessAsync(DashboardLead job, Business? newBusiness)
     {
         if (job == null) return;
         if (job.BusinessId == newBusiness?.Id) return;
@@ -273,7 +272,7 @@ public partial class MainViewModel : ObservableObject
         job.RaisePropertyChanged(nameof(job.DisplayBusinessName));
     }
 
-    public async Task ChangePreferredContactAsync(DashboardJobOpportunity job, JobHunter.Domain.Models.Contact? newContact)
+    public async Task ChangePreferredContactAsync(DashboardLead job, JobHunter.Domain.Models.Contact? newContact)
     {
         if (job == null) return;
         if (job.PreferredContactId == newContact?.Id) return;
@@ -294,11 +293,11 @@ public partial class MainViewModel : ObservableObject
         var seao = AvailableBusinesses.FirstOrDefault(b => b.Name == "SEAO Quebec");
         var xometry = AvailableBusinesses.FirstOrDefault(b => b.Name == "Xometry Partner Network");
 
-        var newJobs = new List<DashboardJobOpportunity>
+        var newJobs = new List<DashboardLead>
         {
-            new DashboardJobOpportunity { Id = $"CB-{Random.Shared.Next(1000,9999)}", Title = "CNC Aerospace Components", BusinessId = canadaBuys?.Id, Business = canadaBuys, ClosingDate = DateTime.Now.AddDays(14), IsAutomationPossible = true, Url = "https://buyandsell.gc.ca/", MachiningProcessInferred = new[] { MachiningProcess.CncMilling }, Materials = new List<Material> { new Material { Id = 8, Name = "Placeholder" } }, EstimatedValue = 4500.00m, AskedPrice = 4000.00m },
-            new DashboardJobOpportunity { Id = $"SE-{Random.Shared.Next(1000,9999)}", Title = "Usinage d'aluminium 6061", BusinessId = seao?.Id, Business = seao, ClosingDate = DateTime.Now.AddDays(5), IsAutomationPossible = true, Url = "https://seao.ca/", MachiningProcessInferred = new[] { MachiningProcess.CncMilling }, Materials = new List<Material> { new Material { Id = 3, Name = "Placeholder" } }, EstimatedValue = 1250.00m, AskedPrice = null },
-            new DashboardJobOpportunity { Id = $"XM-{Random.Shared.Next(1000,9999)}", Title = "Rapid Prototyping - Medical Device", BusinessId = xometry?.Id, Business = xometry, ClosingDate = DateTime.Now.AddDays(2), IsAutomationPossible = false, Url = "https://xometry.com/", MachiningProcessInferred = new[] { MachiningProcess.CncTurning }, Materials = new List<Material> { new Material { Id = 17, Name = "Placeholder" } }, EstimatedValue = 800.00m, AskedPrice = 750.00m }
+            new DashboardLead { Id = $"CB-{Random.Shared.Next(1000,9999)}", Title = "CNC Aerospace Components", BusinessId = canadaBuys?.Id, Business = canadaBuys, ClosingDate = DateTime.Now.AddDays(14), IsAutomationPossible = true, Url = "https://buyandsell.gc.ca/", MachiningProcessInferred = new[] { MachiningProcess.CncMilling }, EstimatedValue = 4500.00m, AskedPrice = 4000.00m },
+            new DashboardLead { Id = $"SE-{Random.Shared.Next(1000,9999)}", Title = "Usinage d'aluminium 6061", BusinessId = seao?.Id, Business = seao, ClosingDate = DateTime.Now.AddDays(5), IsAutomationPossible = true, Url = "https://seao.ca/", MachiningProcessInferred = new[] { MachiningProcess.CncMilling }, EstimatedValue = 1250.00m, AskedPrice = null },
+            new DashboardLead { Id = $"XM-{Random.Shared.Next(1000,9999)}", Title = "Rapid Prototyping - Medical Device", BusinessId = xometry?.Id, Business = xometry, ClosingDate = DateTime.Now.AddDays(2), IsAutomationPossible = false, Url = "https://xometry.com/", MachiningProcessInferred = new[] { MachiningProcess.CncTurning }, EstimatedValue = 800.00m, AskedPrice = 750.00m }
         };
 
         foreach (var job in newJobs)
@@ -315,14 +314,14 @@ public partial class MainViewModel : ObservableObject
         }
     }
 
-    public async Task ChangeStatusAsync(DashboardJobOpportunity job, JobStatus newStatus)
+    public async Task ChangeStatusAsync(DashboardLead job, LeadStatus newStatus)
     {
         if (job == null || job.Status?.Id == newStatus?.Id) return;
 
         try
         {
             string? reason = null;
-            if (newStatus?.Name == JobStatus.Lost || newStatus?.Name == JobStatus.Rejected)
+            if (newStatus?.Name == LeadStatus.Lost || newStatus?.Name == LeadStatus.Rejected)
             {
                 if (Application.Current?.MainPage != null)
                 {
@@ -339,7 +338,7 @@ public partial class MainViewModel : ObservableObject
                 }
             }
 
-            if (newStatus?.Name == JobStatus.Quoted)
+            if (newStatus?.Name == LeadStatus.Quoted)
             {
                 bool hasQuote = await _workflowService.HasQuotePdfAsync(job.Id);
                 if (!hasQuote)
@@ -382,7 +381,7 @@ public partial class MainViewModel : ObservableObject
             job.RaisePropertyChanged(nameof(job.Status));
             job.RaisePropertyChanged(nameof(job.StatusHistories));
 
-            if (job.Status?.Name == JobStatus.Quoted)
+            if (job.Status?.Name == LeadStatus.Quoted)
             {
                 var quote = new Quote
                 {
@@ -423,7 +422,7 @@ public partial class MainViewModel : ObservableObject
         }
     }
 
-    private async Task ImportQuoteAsync(DashboardJobOpportunity job)
+    private async Task ImportQuoteAsync(DashboardLead job)
     {
         if (job == null) return;
         try
@@ -451,7 +450,7 @@ public partial class MainViewModel : ObservableObject
         }
     }
 
-    private async Task GenerateDummyQuoteAsync(DashboardJobOpportunity job)
+    private async Task GenerateDummyQuoteAsync(DashboardLead job)
     {
         if (job == null) return;
         try
@@ -472,7 +471,7 @@ public partial class MainViewModel : ObservableObject
         }
     }
 
-    private async Task OpenLeadFolderAsync(DashboardJobOpportunity job)
+    private async Task OpenLeadFolderAsync(DashboardLead job)
     {
         if (job == null) return;
         try
@@ -487,7 +486,7 @@ public partial class MainViewModel : ObservableObject
         }
     }
 
-    private async Task ViewHistoryAsync(DashboardJobOpportunity job)
+    private async Task ViewHistoryAsync(DashboardLead job)
     {
         if (job == null) return;
         if (Application.Current?.MainPage != null)

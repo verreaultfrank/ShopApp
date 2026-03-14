@@ -1,4 +1,3 @@
-using JobHunter.Application.Interfaces;
 using JobHunter.Domain.Models;
 using Microsoft.Extensions.Logging;
 
@@ -13,7 +12,7 @@ public class EmailService : IEmailService
         _logger = logger;
     }
 
-    public Task SendQuoteEmailAsync(JobOpportunity job, Quote quote)
+    public Task SendQuoteEmailAsync(Lead job, Quote quote)
     {
         // Mock implementation of sending an email
         _logger.LogInformation("===========================================");
